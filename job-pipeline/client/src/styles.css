@@ -1,0 +1,126 @@
+body {
+  margin: 0;
+  font-family: Segoe UI, Arial, sans-serif;
+  background: #f3f5f9;
+  color: #1c2230;
+}
+
+.shell {
+  width: min(1140px, calc(100% - 32px));
+  margin: 30px auto;
+}
+
+.hero,
+.panel,
+.card {
+  border: 1px solid #d7dde8;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.hero,
+.panel,
+.card {
+  padding: 18px;
+}
+
+.hero {
+  margin-bottom: 18px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 350px 1fr;
+  gap: 18px;
+}
+
+.eyebrow {
+  margin: 0 0 6px;
+  color: #265f93;
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+h1,
+h2,
+p {
+  margin-top: 0;
+}
+
+label {
+  display: block;
+  margin: 14px 0 6px;
+  font-weight: 750;
+}
+
+input,
+select,
+textarea {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #d7dde8;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font: inherit;
+}
+
+.toolbar {
+  display: grid;
+  grid-template-columns: 1fr 180px;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.stage-strip,
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.stage-strip {
+  margin-bottom: 14px;
+}
+
+.stage-strip span {
+  border-radius: 999px;
+  padding: 6px 10px;
+  background: #edf3f9;
+  font-weight: 800;
+}
+
+.cards {
+  display: grid;
+  gap: 12px;
+}
+
+button {
+  border: 0;
+  border-radius: 8px;
+  padding: 10px 13px;
+  font: inherit;
+  font-weight: 800;
+  color: #fff;
+  background: #265f93;
+}
+
+button.secondary {
+  color: #1c2230;
+  background: #e6ebf1;
+}
+
+button.danger {
+  background: #a63131;
+}
+
+.message {
+  color: #667386;
+}
+
+@media (max-width: 860px) {
+  .grid,
+  .toolbar {
+    grid-template-columns: 1fr;
+  }
+}

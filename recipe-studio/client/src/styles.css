@@ -1,0 +1,118 @@
+body {
+  margin: 0;
+  font-family: Segoe UI, Arial, sans-serif;
+  background: #f7f4ee;
+  color: #211f1a;
+}
+
+.app {
+  width: min(1140px, calc(100% - 32px));
+  margin: 30px auto;
+}
+
+.hero,
+.panel,
+.recipe {
+  border: 1px solid #ded6c8;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.hero,
+.panel,
+.recipe {
+  padding: 18px;
+}
+
+.hero {
+  margin-bottom: 18px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 350px 1fr;
+  gap: 18px;
+}
+
+.eyebrow {
+  margin: 0 0 6px;
+  color: #8f4f28;
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+h1,
+h2,
+p {
+  margin-top: 0;
+}
+
+label {
+  display: block;
+  margin: 14px 0 6px;
+  font-weight: 750;
+}
+
+input,
+select,
+textarea {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #ded6c8;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font: inherit;
+}
+
+.field-row,
+.toolbar {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.toolbar {
+  margin-bottom: 14px;
+}
+
+.recipes {
+  display: grid;
+  gap: 12px;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+button {
+  border: 0;
+  border-radius: 8px;
+  padding: 10px 13px;
+  font: inherit;
+  font-weight: 800;
+  color: #fff;
+  background: #8f4f28;
+}
+
+button.secondary {
+  color: #211f1a;
+  background: #eee5da;
+}
+
+button.danger {
+  background: #a63131;
+}
+
+.message {
+  color: #6b6258;
+}
+
+@media (max-width: 860px) {
+  .grid,
+  .toolbar {
+    grid-template-columns: 1fr;
+  }
+}

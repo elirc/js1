@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Snippet Vault CRUD</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="app-shell">
+    <section class="panel form-panel" aria-labelledby="snippet-form-title">
+      <p class="eyebrow">Project 7</p>
+      <h1 id="snippet-form-title">Snippet Vault</h1>
+      <p class="lede">Practice splitting an app into ES modules, plus tags, search, and the Clipboard API.</p>
+
+      <form id="snippet-form">
+        <input type="hidden" id="snippet-id">
+
+        <label for="snippet-title">Title</label>
+        <input id="snippet-title" name="title" type="text" maxlength="80" placeholder="Debounce helper" required>
+
+        <div class="field-grid">
+          <div>
+            <label for="snippet-language">Language</label>
+            <select id="snippet-language" name="language">
+              <option value="JavaScript">JavaScript</option>
+              <option value="TypeScript">TypeScript</option>
+              <option value="HTML">HTML</option>
+              <option value="CSS">CSS</option>
+              <option value="Shell">Shell</option>
+              <option value="SQL">SQL</option>
+            </select>
+          </div>
+          <div>
+            <label for="snippet-tags">Tags (comma separated)</label>
+            <input id="snippet-tags" name="tags" type="text" placeholder="utility, async">
+          </div>
+        </div>
+
+        <label for="snippet-code">Code</label>
+        <textarea id="snippet-code" name="code" rows="7" placeholder="const sleep = (ms) =&gt; new Promise(r =&gt; setTimeout(r, ms));" required></textarea>
+
+        <div class="actions">
+          <button type="submit" id="submit-button">Save snippet</button>
+          <button type="button" class="secondary" id="cancel-edit" hidden>Cancel</button>
+        </div>
+        <p class="form-message" id="form-message" role="status"></p>
+      </form>
+    </section>
+
+    <section class="panel list-panel" aria-labelledby="snippet-list-title">
+      <div class="section-header">
+        <div>
+          <p class="eyebrow">Library</p>
+          <h2 id="snippet-list-title">Saved snippets</h2>
+        </div>
+        <p class="counter"><span id="snippet-count">0</span> shown</p>
+      </div>
+
+      <div class="toolbar">
+        <input id="search-input" type="search" placeholder="Search title, code, or tags">
+        <select id="language-filter" aria-label="Filter by language">
+          <option value="All">All languages</option>
+          <option value="JavaScript">JavaScript</option>
+          <option value="TypeScript">TypeScript</option>
+          <option value="HTML">HTML</option>
+          <option value="CSS">CSS</option>
+          <option value="Shell">Shell</option>
+          <option value="SQL">SQL</option>
+        </select>
+      </div>
+
+      <div id="snippet-list" class="card-list" aria-live="polite"></div>
+      <p id="empty-state" class="empty-state" hidden>No snippets match the current view.</p>
+    </section>
+  </main>
+
+  <script type="module" src="src/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reading List CRUD</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="shell">
+    <section class="heading">
+      <p class="eyebrow">Project 4</p>
+      <h1>Reading List</h1>
+      <p>Track books through a small CRUD workflow with sorting and completion state.</p>
+    </section>
+
+    <section class="workspace">
+      <form id="book-form" class="panel" aria-label="Book form">
+        <input type="hidden" id="book-id">
+
+        <label for="title">Title</label>
+        <input id="title" type="text" maxlength="90" placeholder="Clean Code" required>
+
+        <label for="author">Author</label>
+        <input id="author" type="text" maxlength="70" placeholder="Robert C. Martin" required>
+
+        <div class="field-pair">
+          <div>
+            <label for="status">Status</label>
+            <select id="status">
+              <option>Want to Read</option>
+              <option>Reading</option>
+              <option>Finished</option>
+            </select>
+          </div>
+          <div>
+            <label for="rating">Rating</label>
+            <select id="rating">
+              <option value="0">Not rated</option>
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+            </select>
+          </div>
+        </div>
+
+        <label for="notes">Notes</label>
+        <textarea id="notes" rows="4" maxlength="180" placeholder="Key idea, quote, or next action"></textarea>
+
+        <div class="actions">
+          <button id="save-button" type="submit">Add book</button>
+          <button id="cancel-button" class="secondary" type="button" hidden>Cancel</button>
+        </div>
+        <p id="message" class="message" role="status"></p>
+      </form>
+
+      <section class="panel">
+        <div class="toolbar">
+          <input id="search" type="search" placeholder="Search books">
+          <select id="sort">
+            <option value="title">Sort by title</option>
+            <option value="status">Sort by status</option>
+            <option value="rating">Sort by rating</option>
+          </select>
+        </div>
+        <div id="books" class="book-grid" aria-live="polite"></div>
+        <p id="empty" class="empty" hidden>No books match the current view.</p>
+      </section>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>

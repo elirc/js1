@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pantry Inventory CRUD</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="app">
+    <header class="hero">
+      <p class="eyebrow">Project 3</p>
+      <h1>Pantry Inventory</h1>
+      <div class="stats" aria-live="polite">
+        <span><strong id="total-items">0</strong> items</span>
+        <span><strong id="low-items">0</strong> low stock</span>
+      </div>
+    </header>
+
+    <section class="grid">
+      <form id="item-form" class="panel" aria-label="Inventory form">
+        <input type="hidden" id="item-id">
+
+        <label for="item-name">Item name</label>
+        <input id="item-name" type="text" maxlength="70" placeholder="Brown rice" required>
+
+        <label for="category">Category</label>
+        <select id="category">
+          <option>Dry goods</option>
+          <option>Produce</option>
+          <option>Frozen</option>
+          <option>Canned</option>
+          <option>Snacks</option>
+        </select>
+
+        <div class="field-row">
+          <div>
+            <label for="quantity">Quantity</label>
+            <input id="quantity" type="number" min="0" step="1" value="1" required>
+          </div>
+          <div>
+            <label for="minimum">Low at</label>
+            <input id="minimum" type="number" min="0" step="1" value="1" required>
+          </div>
+        </div>
+
+        <label for="expires">Expires</label>
+        <input id="expires" type="date" required>
+
+        <div class="actions">
+          <button id="submit-button" type="submit">Add item</button>
+          <button id="cancel-button" type="button" class="secondary" hidden>Cancel</button>
+        </div>
+        <p id="message" class="message" role="status"></p>
+      </form>
+
+      <section class="panel">
+        <div class="toolbar">
+          <input id="search" type="search" placeholder="Search pantry">
+          <select id="filter">
+            <option value="All">All items</option>
+            <option value="Low">Low stock</option>
+            <option value="Fresh">Fresh</option>
+          </select>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Item</th>
+              <th>Category</th>
+              <th>Qty</th>
+              <th>Expires</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="items"></tbody>
+        </table>
+        <p id="empty" class="empty" hidden>No pantry items found.</p>
+      </section>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>

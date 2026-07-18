@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Flashcards CRUD</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="app-shell">
+    <header class="app-header">
+      <div>
+        <p class="eyebrow">Project 11</p>
+        <h1>Flashcards</h1>
+        <p class="lede">Practice switching between view modes: manage your cards, then study them.</p>
+      </div>
+      <div class="mode-toggle" role="tablist" aria-label="Mode">
+        <button type="button" id="manage-tab" class="active" role="tab">Manage</button>
+        <button type="button" id="study-tab" role="tab">Study</button>
+      </div>
+    </header>
+
+    <div class="toolbar">
+      <label for="deck-filter">Deck</label>
+      <select id="deck-filter"></select>
+    </div>
+
+    <!-- MANAGE VIEW -->
+    <section id="manage-view" class="view">
+      <div class="grid">
+        <form id="card-form" class="panel">
+          <input type="hidden" id="card-id">
+
+          <label for="card-deck">Deck</label>
+          <input id="card-deck" type="text" list="deck-options" maxlength="40" placeholder="Spanish" required>
+          <datalist id="deck-options"></datalist>
+
+          <label for="card-front">Front (prompt)</label>
+          <textarea id="card-front" rows="3" maxlength="200" placeholder="How do you say 'hello'?" required></textarea>
+
+          <label for="card-back">Back (answer)</label>
+          <textarea id="card-back" rows="3" maxlength="200" placeholder="Hola" required></textarea>
+
+          <div class="actions">
+            <button type="submit" id="submit-button">Add card</button>
+            <button type="button" class="secondary" id="cancel-edit" hidden>Cancel</button>
+          </div>
+          <p class="form-message" id="form-message" role="status"></p>
+        </form>
+
+        <section class="panel">
+          <div class="section-header">
+            <h2>Cards</h2>
+            <p class="counter"><span id="card-count">0</span> shown</p>
+          </div>
+          <div id="card-list" class="card-list"></div>
+          <p id="manage-empty" class="empty-state" hidden>No cards in this deck yet.</p>
+        </section>
+      </div>
+    </section>
+
+    <!-- STUDY VIEW -->
+    <section id="study-view" class="view" hidden>
+      <div class="panel study-panel">
+        <p class="study-progress" id="study-progress">Card 0 of 0</p>
+        <div class="flashcard" id="flashcard" role="button" tabindex="0" aria-label="Flashcard, click to flip">
+          <p class="flashcard-side" id="flashcard-text">No cards to study.</p>
+          <p class="flashcard-hint" id="flashcard-hint"></p>
+        </div>
+        <div class="study-controls">
+          <button type="button" class="secondary" id="again-button">Again</button>
+          <button type="button" id="flip-button">Flip</button>
+          <button type="button" id="known-button">Got it</button>
+        </div>
+        <div class="study-meta">
+          <button type="button" class="link-button" id="shuffle-button">Shuffle</button>
+          <span class="muted" id="study-summary"></span>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>

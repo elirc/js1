@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Task Board CRUD</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="app-shell">
+    <section class="panel form-panel" aria-labelledby="task-form-title">
+      <p class="eyebrow">Project 1</p>
+      <h1 id="task-form-title">Task Board</h1>
+      <p class="lede">Practice CRUD, filtering, validation, edit state, and localStorage persistence.</p>
+
+      <form id="task-form">
+        <input type="hidden" id="task-id">
+
+        <label for="task-title">Task</label>
+        <input id="task-title" name="title" type="text" maxlength="80" placeholder="Write unit tests" required>
+
+        <div class="field-grid">
+          <div>
+            <label for="task-priority">Priority</label>
+            <select id="task-priority" name="priority">
+              <option value="Low">Low</option>
+              <option value="Medium" selected>Medium</option>
+              <option value="High">High</option>
+            </select>
+          </div>
+          <div>
+            <label for="task-status">Status</label>
+            <select id="task-status" name="status">
+              <option value="Backlog">Backlog</option>
+              <option value="In Progress">In Progress</option>
+              <option value="Done">Done</option>
+            </select>
+          </div>
+        </div>
+
+        <label for="task-due">Due date</label>
+        <input id="task-due" name="due" type="date" required>
+
+        <label for="task-notes">Notes</label>
+        <textarea id="task-notes" name="notes" rows="4" maxlength="180" placeholder="Acceptance criteria or reminders"></textarea>
+
+        <div class="actions">
+          <button type="submit" id="submit-button">Add task</button>
+          <button type="button" class="secondary" id="cancel-edit" hidden>Cancel</button>
+        </div>
+        <p class="form-message" id="form-message" role="status"></p>
+      </form>
+    </section>
+
+    <section class="panel list-panel" aria-labelledby="task-list-title">
+      <div class="section-header">
+        <div>
+          <p class="eyebrow">Tasks</p>
+          <h2 id="task-list-title">Current work</h2>
+        </div>
+        <p class="counter"><span id="task-count">0</span> shown</p>
+      </div>
+
+      <div class="toolbar">
+        <input id="search-input" type="search" placeholder="Search tasks">
+        <select id="status-filter" aria-label="Filter by status">
+          <option value="All">All statuses</option>
+          <option value="Backlog">Backlog</option>
+          <option value="In Progress">In Progress</option>
+          <option value="Done">Done</option>
+        </select>
+      </div>
+
+      <div id="task-list" class="card-list" aria-live="polite"></div>
+      <p id="empty-state" class="empty-state" hidden>No tasks match the current view.</p>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,35 @@
+import "dotenv/config";
+import pg from "pg";
+
+const { Pool } = pg;
+
+// A single shared connection pool for the whole process. Never open a new
+// client per request — borrow one from the pool and release it.
+export const pool = new Pool({
+  connectionString:
+    process.env.DATABASE_URL ?? "postgres://postgres:postgres@localhost:5432/invoice_studio"
+});
+
+export async function query<Row>(text: string, params: unknown[] = []): Promise<Row[]> {
+  const result = await pool.query(text, params);
+  return result.rows as Row[];
+}
+
+// Wraps a unit of work in BEGIN/COMMIT, rolling back on any error so the
+// database never ends up half-written.
+export async function withTransaction<T>(
+  work: (client: pg.PoolClient) => Promise<T>
+): Promise<T> {
+  const client = await pool.connect();
+  try {
+    await client.query("BEGIN");
+    const result = await work(client);
+    await client.query("COMMIT");
+    return result;
+  } catch (error) {
+    await client.query("ROLLBACK");
+    throw error;
+  } finally {
+    client.release();
+  }
+}

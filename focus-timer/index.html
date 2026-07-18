@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Focus Timer CRUD</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="app-shell">
+    <section class="panel timer-panel" aria-labelledby="timer-title">
+      <p class="eyebrow">Project 9</p>
+      <h1 id="timer-title">Focus Timer</h1>
+      <p class="lede">Practice a setInterval state machine: start, pause, reset, and log finished sessions.</p>
+
+      <div class="timer-display" id="timer-display" role="timer" aria-live="polite">25:00</div>
+      <p class="timer-status" id="timer-status">Ready</p>
+
+      <div class="setup">
+        <label for="session-label">Label</label>
+        <input id="session-label" type="text" maxlength="40" value="Deep work">
+
+        <label for="session-minutes">Minutes</label>
+        <input id="session-minutes" type="number" min="1" max="120" value="25">
+      </div>
+
+      <div class="timer-controls">
+        <button type="button" id="start-button">Start</button>
+        <button type="button" class="secondary" id="reset-button">Reset</button>
+      </div>
+      <p class="form-message" id="form-message" role="status"></p>
+
+      <p class="today muted" id="today-total">No focus time logged today.</p>
+    </section>
+
+    <section class="panel list-panel" aria-labelledby="log-title">
+      <div class="section-header">
+        <div>
+          <p class="eyebrow">Session log</p>
+          <h2 id="log-title">Completed sessions</h2>
+        </div>
+        <p class="counter"><span id="session-count">0</span> logged</p>
+      </div>
+
+      <div id="session-list" class="card-list" aria-live="polite"></div>
+      <p id="empty-state" class="empty-state" hidden>Finish a timer to log your first session.</p>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>

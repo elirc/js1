@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kanban Flow CRUD</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="app-shell">
+    <header class="board-header">
+      <div>
+        <p class="eyebrow">Project 10</p>
+        <h1>Kanban Flow</h1>
+        <p class="lede">Practice the native HTML5 drag-and-drop API: reorder cards and move them between columns.</p>
+      </div>
+      <form id="card-form" class="quick-add">
+        <input id="card-title" type="text" maxlength="80" placeholder="New card title" required>
+        <select id="card-column" aria-label="Starting column">
+          <option value="todo">To Do</option>
+          <option value="doing">Doing</option>
+          <option value="done">Done</option>
+        </select>
+        <button type="submit">Add card</button>
+      </form>
+    </header>
+
+    <p class="form-message" id="form-message" role="status"></p>
+
+    <section class="board" id="board" aria-label="Kanban board"></section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>

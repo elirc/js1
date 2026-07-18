@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Poll Studio CRUD</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="app-shell">
+    <section class="panel form-panel" aria-labelledby="poll-form-title">
+      <p class="eyebrow">Project 8</p>
+      <h1 id="poll-form-title">Poll Studio</h1>
+      <p class="lede">Practice dynamic field arrays, then aggregate votes into percentage bars.</p>
+
+      <form id="poll-form">
+        <input type="hidden" id="poll-id">
+
+        <label for="poll-question">Question</label>
+        <input id="poll-question" name="question" type="text" maxlength="120" placeholder="What should we build next?" required>
+
+        <div class="options-head">
+          <label>Options</label>
+          <button type="button" class="secondary" id="add-option">+ Add option</button>
+        </div>
+        <div id="option-rows" class="option-rows"></div>
+        <p class="hint muted">Polls need at least two options. Editing keeps existing votes when the option count stays the same.</p>
+
+        <div class="actions">
+          <button type="submit" id="submit-button">Create poll</button>
+          <button type="button" class="secondary" id="cancel-edit" hidden>Cancel</button>
+        </div>
+        <p class="form-message" id="form-message" role="status"></p>
+      </form>
+    </section>
+
+    <section class="panel list-panel" aria-labelledby="poll-list-title">
+      <div class="section-header">
+        <div>
+          <p class="eyebrow">Live results</p>
+          <h2 id="poll-list-title">Polls</h2>
+        </div>
+        <p class="counter"><span id="poll-count">0</span> polls</p>
+      </div>
+
+      <div id="poll-list" class="poll-list" aria-live="polite"></div>
+      <p id="empty-state" class="empty-state" hidden>Create a poll to collect votes.</p>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>

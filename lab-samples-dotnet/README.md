@@ -1,0 +1,47 @@
+# Lab Samples
+
+A C# / .NET 8 / Postgres medium-complexity CRUD study project for lab samples, technicians, sample classes, processing costs, and chain-of-custody status.
+
+## Tech stack
+
+- ASP.NET Core Minimal APIs
+- Dapper for explicit SQL mapping
+- Npgsql for Postgres connectivity
+- PostgreSQL full-text search, constraints, indexes, and cascades
+- Repository pattern with transaction boundaries
+
+## API overview
+
+- GET /api/samples lists samples with search, status filter, category filter, sorting, and pagination.
+- GET /api/samples/stats returns totals grouped by status and category.
+- GET /api/samples/{id} fetches one sample.
+- POST /api/samples creates one sample and writes an activity entry in the same transaction.
+- PUT /api/samples/{id} replaces editable fields.
+- PATCH /api/samples/{id}/status changes workflow status and writes an activity entry.
+- GET /api/samples/{id}/activity lists activity history.
+- POST /api/samples/{id}/activity adds a note.
+- DELETE /api/samples/{id} deletes a record and cascades activity rows.
+
+## Local study setup
+
+No packages are installed in this workspace. When you are ready to run it:
+
+~~~bash
+cd lab-samples-dotnet
+createdb lab_samples_dotnet
+psql lab_samples_dotnet < db/schema.sql
+dotnet restore
+dotnet run
+~~~
+
+Use '.env.example' or 'appsettings.Development.json' as the shape for the database connection string.
+
+## What this project is designed to teach
+
+- How a route group exposes a focused HTTP API.
+- How request DTOs protect your domain from arbitrary JSON.
+- How validation happens before database writes.
+- How Dapper keeps SQL visible instead of hiding it behind an ORM.
+- How Postgres constraints duplicate important business rules at the storage layer.
+- How transactions keep a primary record and its activity log consistent.
+- How pagination, sorting, and filtering are implemented safely.

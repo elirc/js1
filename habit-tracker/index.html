@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Habit Tracker CRUD</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="app-shell">
+    <section class="panel form-panel" aria-labelledby="habit-form-title">
+      <p class="eyebrow">Project 6</p>
+      <h1 id="habit-form-title">Habit Tracker</h1>
+      <p class="lede">Practice date math, streak computation, a toggle grid, and derived weekly stats.</p>
+
+      <form id="habit-form">
+        <input type="hidden" id="habit-id">
+
+        <label for="habit-name">Habit</label>
+        <input id="habit-name" name="name" type="text" maxlength="40" placeholder="Read 20 pages" required>
+
+        <label for="habit-color">Accent color</label>
+        <select id="habit-color" name="color">
+          <option value="teal">Teal</option>
+          <option value="indigo">Indigo</option>
+          <option value="rose">Rose</option>
+          <option value="amber">Amber</option>
+        </select>
+
+        <div class="actions">
+          <button type="submit" id="submit-button">Add habit</button>
+          <button type="button" class="secondary" id="cancel-edit" hidden>Cancel</button>
+        </div>
+        <p class="form-message" id="form-message" role="status"></p>
+      </form>
+
+      <div class="legend">
+        <p class="eyebrow">This week</p>
+        <p class="muted" id="overall-summary">No habits yet.</p>
+      </div>
+    </section>
+
+    <section class="panel list-panel" aria-labelledby="habit-list-title">
+      <div class="section-header">
+        <div>
+          <p class="eyebrow">Habits</p>
+          <h2 id="habit-list-title">Daily check-ins</h2>
+        </div>
+        <p class="counter"><span id="habit-count">0</span> tracked</p>
+      </div>
+
+      <div id="habit-list" class="habit-list" aria-live="polite"></div>
+      <p id="empty-state" class="empty-state" hidden>Add a habit to start a streak.</p>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contact Book CRUD</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="layout">
+    <section class="workspace">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">Project 2</p>
+          <h1>Contact Book</h1>
+        </div>
+        <input id="search" type="search" placeholder="Search name, email, company">
+      </header>
+
+      <section class="content-grid">
+        <form id="contact-form" class="panel" aria-label="Contact form">
+          <input type="hidden" id="contact-id">
+
+          <label for="name">Full name</label>
+          <input id="name" type="text" maxlength="70" placeholder="Ada Lovelace" required>
+
+          <label for="email">Email</label>
+          <input id="email" type="email" placeholder="ada@example.com" required>
+
+          <label for="phone">Phone</label>
+          <input id="phone" type="tel" maxlength="20" placeholder="555-0123" required>
+
+          <label for="company">Company</label>
+          <input id="company" type="text" maxlength="60" placeholder="Analytical Engines Co.">
+
+          <label for="relationship">Relationship</label>
+          <select id="relationship">
+            <option>Client</option>
+            <option>Colleague</option>
+            <option>Friend</option>
+            <option>Vendor</option>
+          </select>
+
+          <div class="actions">
+            <button id="save-button" type="submit">Add contact</button>
+            <button id="clear-button" class="secondary" type="button" hidden>Cancel</button>
+          </div>
+          <p id="message" class="message" role="status"></p>
+        </form>
+
+        <section class="panel">
+          <div class="list-header">
+            <h2>Directory</h2>
+            <span><strong id="count">0</strong> contacts</span>
+          </div>
+          <div id="contacts" class="contacts" aria-live="polite"></div>
+          <p id="empty" class="empty" hidden>No contacts found.</p>
+        </section>
+      </section>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
