@@ -83,23 +83,32 @@ function cardsIn(columnId) {
 
 // Drop the dragged card into `columnId`, positioned before `beforeId`
 // (or at the end when `beforeId` is null), then renumber every column.
-function moveCard(columnId, beforeId) {
-  const dragged = state.cards.find((card) => card.id === state.draggingId);
-  if (!dragged) return;
+function moveCard(columnId, beforeId, cardId = state.draggingId) {
+  const current = state.cards.find(card => card.id === cardId);
+  if (!current || !COLUMNS.some(column => column.id === columnId)) return false;
+  if (beforeId === cardId) return true;
+  if (beforeId && !state.cards.some(card => card.id === beforeId && card.column === columnId)) return false;
+  const candidate = state.cards.map(card => ({ ...card }));
+  const moved = candidate.find(card => card.id === cardId);
+  moved.column = columnId;
+  for (const column of COLUMNS) {
+    const ordered = candidate.filter(card => card.column === column.id && card.id !== cardId)
+      .sort((a,b) => a.order - b.order || a.id.localeCompare(b.id));
+    if (column.id === columnId) ordered.splice(beforeId ? ordered.findIndex(card => card.id === beforeId) : ordered.length, 0, moved);
+    ordered.forEach((card,index) => { card.order = index; });
+  }
+  // A drop that changes nothing must not claim it moved anything, and must not write.
+  if (JSON.stringify(candidate) === JSON.stringify(state.cards)) { showMessage("Card is already there."); return true; }
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(candidate)); }
+  catch { showMessage("Could not save the move. The board is unchanged."); return false; }
+  state.cards = candidate; render(); showMessage("Card moved."); return true;
+}
 
-  dragged.column = columnId;
-
-  const ordered = cardsIn(columnId).filter((card) => card.id !== dragged.id);
-  const insertAt = beforeId
-    ? ordered.findIndex((card) => card.id === beforeId)
-    : ordered.length;
-  ordered.splice(insertAt < 0 ? ordered.length : insertAt, 0, dragged);
-  ordered.forEach((card, index) => {
-    card.order = index;
-  });
-
-  saveCards();
-  render();
+function moveByKeyboard(card, direction) {
+  const ordered = cardsIn(card.column), index = ordered.findIndex(x => x.id === card.id);
+  const before = direction < 0 ? ordered[index - 1]?.id : ordered[index + 2]?.id ?? null;
+  if (direction < 0 && index === 0 || direction > 0 && index === ordered.length - 1) return;
+  if (moveCard(card.column, before, card.id)) document.querySelector(`[data-id="${card.id}"] .move-column`)?.focus();
 }
 
 function render() {
@@ -177,7 +186,16 @@ function buildCard(card) {
     iconButton("Delete", () => deleteCard(card.id), "danger")
   );
 
-  el.append(title, actions);
+  const move = document.createElement("select");
+  move.className = "move-column"; move.setAttribute("aria-label", `Move ${card.title} to column`);
+  for (const column of COLUMNS) move.add(new Option(column.title, column.id));
+  move.value = card.column;
+  move.addEventListener("change", () => {
+    moveCard(move.value, null, card.id);
+    document.querySelector(`[data-id="${card.id}"] .move-column`)?.focus();
+  });
+  actions.append(iconButton("Move up", () => moveByKeyboard(card,-1)), iconButton("Move down", () => moveByKeyboard(card,1)));
+  el.append(title, move, actions);
   return el;
 }
 

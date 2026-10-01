@@ -122,20 +122,20 @@ export default function App() {
       <section className="grid">
         <form className="panel" onSubmit={handlePostSubmit}>
           <h2>{editingId ? "Edit post" : "New post"}</h2>
-          <label>Title</label>
-          <input value={postForm.title} onChange={(event) => setPostForm({ ...postForm, title: event.target.value })} />
+          <label htmlFor="lesson-field-1">Title</label>
+          <input id="lesson-field-1" value={postForm.title} onChange={(event) => setPostForm({ ...postForm, title: event.target.value })} />
 
-          <label>Author</label>
-          <input value={postForm.author} onChange={(event) => setPostForm({ ...postForm, author: event.target.value })} />
+          <label htmlFor="lesson-field-2">Author</label>
+          <input id="lesson-field-2" value={postForm.author} onChange={(event) => setPostForm({ ...postForm, author: event.target.value })} />
 
-          <label>Body</label>
-          <textarea rows="6" value={postForm.body} onChange={(event) => setPostForm({ ...postForm, body: event.target.value })} />
+          <label htmlFor="lesson-field-3">Body</label>
+          <textarea id="lesson-field-3" rows="6" value={postForm.body} onChange={(event) => setPostForm({ ...postForm, body: event.target.value })} />
 
           <div className="actions">
             <button type="submit">{editingId ? "Save post" : "Publish"}</button>
             {editingId && <button type="button" className="secondary" onClick={resetPostForm}>Cancel</button>}
           </div>
-          <p className="message">{message}</p>
+          <p role="status" className="message">{message}</p>
         </form>
 
         <section className="panel">

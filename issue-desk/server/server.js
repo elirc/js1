@@ -1,17 +1,25 @@
+import { pathToFileURL } from "node:url";
 import express from "express";
 import cors from "cors";
 
-const app = express();
+export const app = express();
 const port = 4101;
 
 app.use(cors());
 app.use(express.json());
+app.use((req,res,next) => {
+  if (["POST","PUT","PATCH"].includes(req.method) && (!req.body || typeof req.body !== "object" || Array.isArray(req.body)))
+    return res.status(400).json({ error: "Send a JSON object." });
+  next();
+});
 
 const repository = createIssueRepository();
 
 app.get("/api/issues", (req, res) => {
-  const { status = "all", search = "" } = req.query;
-  res.json(repository.list({ status, search }));
+  const { status = "all", search = "", priority = "all" } = req.query;
+  if (typeof search !== "string" || !["all","Low","Medium","High","Critical"].includes(priority))
+    return res.status(400).json({ error: "Use a text search and a valid priority filter." });
+  res.json(repository.list({ status, search, priority }));
 });
 
 app.get("/api/issues/:id", (req, res) => {
@@ -43,18 +51,16 @@ app.delete("/api/issues/:id", (req, res) => {
   res.status(204).send();
 });
 
-app.listen(port, () => {
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) app.listen(port, () => {
   console.log(`Issue Desk API listening on http://localhost:${port}`);
 });
 
 function validateIssue(req, res, next) {
   const { title, status, priority, assignee } = req.body;
+  if (!isText(title,3) || !isText(assignee,2) || req.body.description !== undefined && !isText(req.body.description,0,10000))
+    return res.status(400).json({ error: "Use bounded text for title, assignee and description." });
   const allowedStatuses = ["Backlog", "In Progress", "Review", "Done"];
   const allowedPriorities = ["Low", "Medium", "High", "Critical"];
-
-  if (!title || title.trim().length < 3) {
-    return res.status(400).json({ error: "Title must be at least 3 characters." });
-  }
 
   if (!allowedStatuses.includes(status)) {
     return res.status(400).json({ error: "Choose a valid status." });
@@ -62,10 +68,6 @@ function validateIssue(req, res, next) {
 
   if (!allowedPriorities.includes(priority)) {
     return res.status(400).json({ error: "Choose a valid priority." });
-  }
-
-  if (!assignee || assignee.trim().length < 2) {
-    return res.status(400).json({ error: "Assignee must be at least 2 characters." });
   }
 
   next();
@@ -94,11 +96,11 @@ function createIssueRepository() {
   ];
 
   return {
-    list({ status, search }) {
+    list({ status, search, priority }) {
       return issues.filter((issue) => {
         const matchesStatus = status === "all" || issue.status === status;
         const text = `${issue.title} ${issue.description} ${issue.assignee}`.toLowerCase();
-        return matchesStatus && text.includes(search.toLowerCase());
+        return matchesStatus && (priority === "all" || issue.priority === priority) && text.includes(search.toLowerCase());
       });
     },
     find(id) {
@@ -140,3 +142,5 @@ function createIssueRepository() {
     }
   };
 }
+
+function isText(value, min = 0, max = 200) { return typeof value === "string" && value.trim().length >= min && value.length <= max; }

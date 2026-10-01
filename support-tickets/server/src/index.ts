@@ -1,3 +1,4 @@
+import { pathToFileURL } from "node:url";
 import "dotenv/config";
 import express from "express";
 import type { Request, Response, NextFunction } from "express";
@@ -14,11 +15,12 @@ import type {
   TicketStatus
 } from "../../shared/types.js";
 
-const app = express();
+export const app = express();
 const port = Number(process.env.PORT ?? 4111);
 
 app.use(cors());
 app.use(express.json());
+app.param("id",(_req,res,next,value) => { if (!validId(value)) return res.status(400).json({ error: "Use a valid record id." }); next(); });
 
 const STATUSES: TicketStatus[] = ["open", "pending", "resolved", "closed"];
 const PRIORITIES: TicketPriority[] = ["low", "normal", "high", "urgent"];
@@ -71,17 +73,17 @@ const TICKET_SELECT = `
 
 // --- Reference data --------------------------------------------------------
 
-app.get("/api/agents", async (_req, res) => {
+app.get("/api/agents", asyncRoute(async (_req, res) => {
   res.json(await query<Agent>("SELECT id, name, email FROM agents ORDER BY name"));
-});
+}));
 
-app.get("/api/labels", async (_req, res) => {
+app.get("/api/labels", asyncRoute(async (_req, res) => {
   res.json(await query<Label>("SELECT id, name, color FROM labels ORDER BY name"));
-});
+}));
 
 // --- Tickets ---------------------------------------------------------------
 
-app.get("/api/tickets", async (req, res) => {
+app.get("/api/tickets", asyncRoute(async (req, res) => {
   const status = asEnum(req.query.status, STATUSES);
   const priority = asEnum(req.query.priority, PRIORITIES);
   const labelId = typeof req.query.label === "string" ? req.query.label : null;
@@ -101,18 +103,18 @@ app.get("/api/tickets", async (req, res) => {
     [status, priority, assigneeId, search, labelId]
   );
   res.json(rows.map(toTicket));
-});
+}));
 
-app.get("/api/tickets/:id", async (req, res) => {
-  const ticket = await loadTicket(req.params.id);
+app.get("/api/tickets/:id", asyncRoute(async (req, res) => {
+  const ticket = await loadTicket(recordId(req));
   if (!ticket) return res.status(404).json({ error: "Ticket not found." });
   res.json(ticket);
-});
+}));
 
-app.get("/api/tickets/:id/events", async (req, res) => {
+app.get("/api/tickets/:id/events", asyncRoute(async (req, res) => {
   const events = await query<{ id: string; kind: string; detail: string; created_at: string }>(
     "SELECT id, kind, detail, created_at FROM ticket_events WHERE ticket_id = $1 ORDER BY created_at DESC",
-    [req.params.id]
+    [recordId(req)]
   );
   const payload: TicketEvent[] = events.map((e) => ({
     id: e.id,
@@ -121,9 +123,9 @@ app.get("/api/tickets/:id/events", async (req, res) => {
     createdAt: e.created_at
   }));
   res.json(payload);
-});
+}));
 
-app.post("/api/tickets", async (req, res, next) => {
+app.post("/api/tickets", asyncRoute(async (req, res, next) => {
   try {
     const input = parseTicket(req.body);
     const id = await withTransaction(async (client) => {
@@ -141,9 +143,9 @@ app.post("/api/tickets", async (req, res, next) => {
   } catch (error) {
     next(error);
   }
-});
+}));
 
-app.put("/api/tickets/:id", async (req, res, next) => {
+app.put("/api/tickets/:id", asyncRoute(async (req, res, next) => {
   try {
     const input = parseTicket(req.body);
     const ok = await withTransaction(async (client) => {
@@ -151,76 +153,86 @@ app.put("/api/tickets/:id", async (req, res, next) => {
         `UPDATE tickets
             SET subject = $2, body = $3, priority = $4, assignee_id = $5, updated_at = now()
           WHERE id = $1`,
-        [req.params.id, input.subject, input.body, input.priority, input.assigneeId]
+        [recordId(req), input.subject, input.body, input.priority, input.assigneeId]
       );
       if (rowCount === 0) return false;
-      await client.query("DELETE FROM ticket_labels WHERE ticket_id = $1", [req.params.id]);
-      await linkLabels(client, req.params.id, input.labelIds);
-      await logEvent(client, req.params.id, "edited", "Ticket details updated");
+      await client.query("DELETE FROM ticket_labels WHERE ticket_id = $1", [recordId(req)]);
+      await linkLabels(client, recordId(req), input.labelIds);
+      await logEvent(client, recordId(req), "edited", "Ticket details updated");
       return true;
     });
     if (!ok) return res.status(404).json({ error: "Ticket not found." });
-    res.json(await loadTicket(req.params.id));
+    res.json(await loadTicket(recordId(req)));
   } catch (error) {
     next(error);
   }
-});
+}));
 
-app.patch("/api/tickets/:id/status", async (req, res, next) => {
+app.patch("/api/tickets/:id/status", asyncRoute(async (req, res, next) => {
   try {
     const status = asEnum(req.body.status, STATUSES);
     if (!status) return res.status(400).json({ error: "Invalid status." });
     const ok = await withTransaction(async (client) => {
+      const current = await client.query<{ status: string }>("SELECT status FROM tickets WHERE id=$1 FOR UPDATE",[recordId(req)]);
+      const currentRow = current.rows[0];
+      if (!currentRow) return false;
+      if (currentRow.status === status) return true;
       const { rowCount } = await client.query(
         "UPDATE tickets SET status = $2, updated_at = now() WHERE id = $1",
-        [req.params.id, status]
+        [recordId(req), status]
       );
       if (rowCount === 0) return false;
-      await logEvent(client, req.params.id, "status", `Status changed to ${status}`);
+      await logEvent(client, recordId(req), "status", `Status changed to ${status}`);
       return true;
     });
     if (!ok) return res.status(404).json({ error: "Ticket not found." });
-    res.json(await loadTicket(req.params.id));
+    res.json(await loadTicket(recordId(req)));
   } catch (error) {
     next(error);
   }
-});
+}));
 
-app.patch("/api/tickets/:id/assignee", async (req, res, next) => {
+app.patch("/api/tickets/:id/assignee", asyncRoute(async (req, res, next) => {
   try {
-    const assigneeId = req.body.assigneeId === null ? null : String(req.body.assigneeId);
+    const assigneeId = req.body?.assigneeId;
+    if (assigneeId !== null && !validId(assigneeId)) throw new ValidationError("Choose a valid agent id or null.");
     const ok = await withTransaction(async (client) => {
+      const current = await client.query<{ assignee_id: string | null }>("SELECT assignee_id FROM tickets WHERE id=$1 FOR UPDATE",[recordId(req)]);
+      const currentRow = current.rows[0];
+      if (!currentRow) return false;
+      if (currentRow.assignee_id === assigneeId) return true;
       const { rowCount } = await client.query(
         "UPDATE tickets SET assignee_id = $2, updated_at = now() WHERE id = $1",
-        [req.params.id, assigneeId]
+        [recordId(req), assigneeId]
       );
       if (rowCount === 0) return false;
       const detail = assigneeId ? "Assigned to an agent" : "Unassigned";
-      await logEvent(client, req.params.id, "assignment", detail);
+      await logEvent(client, recordId(req), "assignment", detail);
       return true;
     });
     if (!ok) return res.status(404).json({ error: "Ticket not found." });
-    res.json(await loadTicket(req.params.id));
+    res.json(await loadTicket(recordId(req)));
   } catch (error) {
     next(error);
   }
-});
+}));
 
-app.delete("/api/tickets/:id", async (req, res) => {
-  const { rowCount } = await pool.query("DELETE FROM tickets WHERE id = $1", [req.params.id]);
+app.delete("/api/tickets/:id", asyncRoute(async (req, res) => {
+  const { rowCount } = await pool.query("DELETE FROM tickets WHERE id = $1", [recordId(req)]);
   if (rowCount === 0) return res.status(404).json({ error: "Ticket not found." });
   res.status(204).send();
-});
+}));
 
 app.use((error: unknown, _req: Request, res: Response, _next: NextFunction) => {
   if (error instanceof ValidationError) {
     return res.status(400).json({ error: error.message });
   }
+  if (["22P02","23503","23505","23514","22003"].includes((error as { code?: string }).code ?? "")) return res.status(400).json({ error: "Invalid reference or value." });
   console.error(error);
   res.status(500).json({ error: "Something went wrong." });
 });
 
-app.listen(port, () => {
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) app.listen(port, () => {
   console.log(`Support Tickets API on http://localhost:${port}`);
 });
 
@@ -255,7 +267,12 @@ function asEnum<T extends string>(value: unknown, allowed: readonly T[]): T | nu
 }
 
 function parseTicket(body: unknown): NewTicket {
+  if (!body || typeof body !== "object" || Array.isArray(body)) throw new ValidationError("Send a ticket object.");
   const data = body as Partial<NewTicket>;
+  if (typeof data.subject !== "string" || data.subject.length > 200 || data.body !== undefined && (typeof data.body !== "string" || data.body.length > 20000) || data.assigneeId != null && !validId(data.assigneeId))
+    throw new ValidationError("Use bounded subject/body text and a valid agent id.");
+  if (data.labelIds !== undefined && (!Array.isArray(data.labelIds) || data.labelIds.length > 30 || !data.labelIds.every(validId)))
+    throw new ValidationError("Use at most 30 valid label ids.");
   const subject = (data.subject ?? "").trim();
   if (subject.length < 3) throw new ValidationError("Subject must be at least 3 characters.");
   const priority = asEnum(data.priority, PRIORITIES);
@@ -269,3 +286,11 @@ function parseTicket(body: unknown): NewTicket {
     labelIds
   };
 }
+
+function asyncRoute(handler: (req: express.Request, res: express.Response, next: express.NextFunction) => Promise<unknown>): express.RequestHandler {
+  return (req,res,next) => { Promise.resolve(handler(req,res,next)).catch(next); };
+}
+
+function validId(value: unknown): value is string { return typeof value === "string" && /^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/i.test(value); }
+
+function recordId(req: express.Request): string { const id = req.params.id; if (!validId(id)) throw new ValidationError("Use a valid record id."); return id; }

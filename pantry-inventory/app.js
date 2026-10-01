@@ -75,7 +75,7 @@ function saveItem(event) {
     expires: expiresInput.value
   };
 
-  if (!item.name || !item.expires || item.quantity < 0 || item.minimum < 0) {
+  if (!item.name || !isRealDate(item.expires) || !Number.isFinite(item.quantity) || !Number.isFinite(item.minimum) || quantityInput.value === "" || minimumInput.value === "" || item.quantity < 0 || item.minimum < 0) {
     setMessage("Add a valid name, quantities, and expiration date.");
     return;
   }
@@ -131,7 +131,7 @@ function getVisibleItems() {
   return items.filter((item) => {
     const matchesSearch = `${item.name} ${item.category}`.toLowerCase().includes(searchTerm);
     const isLow = item.quantity <= item.minimum;
-    const matchesFilter = activeFilter === "All" || (activeFilter === "Low" && isLow) || (activeFilter === "Fresh" && !isLow);
+    const matchesFilter = activeFilter === "All" || (activeFilter === "Low" && isLow) || (activeFilter === "Fresh" && !isLow && !isExpired(item)) || (activeFilter === "Expired" && isExpired(item));
     return matchesSearch && matchesFilter;
   });
 }
@@ -145,7 +145,9 @@ function renderItems() {
 
   visibleItems.forEach((item) => {
     const row = document.createElement("tr");
-    const statusText = item.quantity <= item.minimum ? "Low" : "Fresh";
+    const low = item.quantity <= item.minimum;
+    const expired = isExpired(item);
+    const statusText = [low ? "Low stock" : "Stock OK", ...(expired ? ["Expired"] : [])].join(" · ");
     row.innerHTML = `
       <td>
         <strong class="name"></strong><br>
@@ -168,12 +170,26 @@ function renderItems() {
     row.querySelector(".expires").textContent = formatDate(item.expires);
     const status = row.querySelector(".status");
     status.textContent = statusText;
-    status.classList.toggle("low", statusText === "Low");
+    status.classList.toggle("low", low || expired);
     row.querySelector("[data-action='edit']").addEventListener("click", () => editItem(item.id));
     row.querySelector("[data-action='delete']").addEventListener("click", () => deleteItem(item.id));
     itemsBody.append(row);
   });
 }
+
+function localToday() {
+  const date = new Date();
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+}
+
+function isExpired(item, today = localToday()) { return item.expires < today; }
+
+function isRealDate(value) {
+  const date = new Date(`${value}T00:00:00Z`);
+  return /^\d{4}-\d{2}-\d{2}$/.test(value) && Number.isFinite(date.getTime()) && date.toISOString().slice(0, 10) === value;
+}
+
+document.addEventListener("visibilitychange", () => { if (!document.hidden) renderItems(); });
 
 function formatDate(dateValue) {
   return new Intl.DateTimeFormat("en", { month: "short", day: "numeric", year: "numeric" }).format(new Date(`${dateValue}T00:00:00`));

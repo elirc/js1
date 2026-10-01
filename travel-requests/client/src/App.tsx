@@ -112,39 +112,39 @@ export default function App() {
       <section className="layout">
         <form className="panel" onSubmit={save}>
           <h2>{editingId ? "Edit TravelRequest" : "New TravelRequest"}</h2>
-          <label>Trip Name</label>
-          <input value={form.title} onChange={(event) => setForm({ ...form, title: event.target.value })} />
-          <label>Traveler</label>
-          <input value={form.owner} onChange={(event) => setForm({ ...form, owner: event.target.value })} />
+          <label htmlFor="lesson-field-1">Trip Name</label>
+          <input id="lesson-field-1" value={form.title} onChange={(event) => setForm({ ...form, title: event.target.value })} />
+          <label htmlFor="lesson-field-2">Traveler</label>
+          <input id="lesson-field-2" value={form.owner} onChange={(event) => setForm({ ...form, owner: event.target.value })} />
           <div className="field-row">
             <div>
-              <label>Category</label>
-              <select value={form.category} onChange={(event) => setForm({ ...form, category: event.target.value })}>{CATEGORIES.map((item) => <option key={item}>{item}</option>)}</select>
+              <label htmlFor="lesson-field-3">Category</label>
+              <select id="lesson-field-3" value={form.category} onChange={(event) => setForm({ ...form, category: event.target.value })}>{CATEGORIES.map((item) => <option key={item}>{item}</option>)}</select>
             </div>
             <div>
-              <label>Status</label>
-              <select value={form.status} onChange={(event) => setForm({ ...form, status: event.target.value })}>{STATUSES.map((item) => <option key={item}>{item}</option>)}</select>
+              <label htmlFor="lesson-field-4">Status</label>
+              <select id="lesson-field-4" value={form.status} onChange={(event) => setForm({ ...form, status: event.target.value })}>{STATUSES.map((item) => <option key={item}>{item}</option>)}</select>
             </div>
           </div>
           <div className="field-row">
             <div>
-              <label>Priority</label>
-              <select value={form.priority} onChange={(event) => setForm({ ...form, priority: event.target.value })}>{PRIORITIES.map((item) => <option key={item}>{item}</option>)}</select>
+              <label htmlFor="lesson-field-5">Priority</label>
+              <select id="lesson-field-5" value={form.priority} onChange={(event) => setForm({ ...form, priority: event.target.value })}>{PRIORITIES.map((item) => <option key={item}>{item}</option>)}</select>
             </div>
             <div>
-              <label>Estimated Cost</label>
-              <input type="number" min="0" value={form.amount} onChange={(event) => setForm({ ...form, amount: Number(event.target.value) })} />
+              <label htmlFor="lesson-field-6">Estimated Cost</label>
+              <input id="lesson-field-6" type="number" min="0" value={form.amount} onChange={(event) => setForm({ ...form, amount: Number(event.target.value) })} />
             </div>
           </div>
-          <label>Due date</label>
-          <input type="date" value={form.dueDate} onChange={(event) => setForm({ ...form, dueDate: event.target.value })} />
-          <label>Notes</label>
-          <textarea rows={4} value={form.notes} onChange={(event) => setForm({ ...form, notes: event.target.value })} />
+          <label htmlFor="lesson-field-7">Due date</label>
+          <input id="lesson-field-7" type="date" value={form.dueDate} onChange={(event) => setForm({ ...form, dueDate: event.target.value })} />
+          <label htmlFor="lesson-field-8">Notes</label>
+          <textarea id="lesson-field-8" rows={4} value={form.notes} onChange={(event) => setForm({ ...form, notes: event.target.value })} />
           <div className="actions">
             <button>{editingId ? "Update" : "Create"}</button>
             {editingId && <button type="button" className="secondary" onClick={resetForm}>Cancel</button>}
           </div>
-          <p className="message">{message}</p>
+          <p role="status" className="message">{message}</p>
         </form>
 
         <section className="panel list-panel">

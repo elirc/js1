@@ -8,7 +8,7 @@ import {
   logout,
   me,
   register,
-  updateNote
+  updateNote,
 } from "./api";
 import "./styles.css";
 
@@ -31,7 +31,11 @@ export default function App() {
   }, []);
 
   if (checking) {
-    return <main className="auth-shell"><p className="muted">Checking session…</p></main>;
+    return (
+      <main className="auth-shell">
+        <p className="muted">Checking session…</p>
+      </main>
+    );
   }
 
   if (!user) {
@@ -62,24 +66,34 @@ function AuthScreen({ onAuthed }) {
       <form className="panel auth-card" onSubmit={handleSubmit}>
         <p className="eyebrow">Advanced Project 8</p>
         <h1>Secure Notes</h1>
-        <p className="muted">{mode === "login" ? "Sign in to your notes." : "Create an account."}</p>
+        <p className="muted">
+          {mode === "login" ? "Sign in to your notes." : "Create an account."}
+        </p>
 
-        <label>Email</label>
+        <label htmlFor="lesson-field-1">Email</label>
         <input
+          id="lesson-field-1"
           type="email"
           value={form.email}
           onChange={(event) => setForm({ ...form, email: event.target.value })}
         />
 
-        <label>Password</label>
+        <label htmlFor="lesson-field-2">Password</label>
         <input
+          id="lesson-field-2"
           type="password"
           value={form.password}
-          onChange={(event) => setForm({ ...form, password: event.target.value })}
+          onChange={(event) =>
+            setForm({ ...form, password: event.target.value })
+          }
         />
 
-        <button type="submit">{mode === "login" ? "Sign in" : "Register"}</button>
-        <p className="message">{message}</p>
+        <button type="submit">
+          {mode === "login" ? "Sign in" : "Register"}
+        </button>
+        <p role="status" className="message">
+          {message}
+        </p>
 
         <p className="switch">
           {mode === "login" ? "No account?" : "Already registered?"}{" "}
@@ -164,23 +178,44 @@ function NotesScreen({ user, onLogout }) {
         </div>
         <div className="account">
           <span className="muted">{user.email}</span>
-          <button type="button" className="secondary" onClick={handleLogout}>Log out</button>
+          <button type="button" className="secondary" onClick={handleLogout}>
+            Log out
+          </button>
         </div>
       </section>
 
       <section className="grid">
         <form className="panel" onSubmit={handleSubmit}>
-          <label>Title</label>
-          <input value={form.title} onChange={(event) => setForm({ ...form, title: event.target.value })} />
+          <label htmlFor="lesson-field-3">Title</label>
+          <input
+            id="lesson-field-3"
+            value={form.title}
+            onChange={(event) =>
+              setForm({ ...form, title: event.target.value })
+            }
+          />
 
-          <label>Body</label>
-          <textarea rows="6" value={form.body} onChange={(event) => setForm({ ...form, body: event.target.value })} />
+          <label htmlFor="lesson-field-4">Body</label>
+          <textarea
+            id="lesson-field-4"
+            rows="6"
+            value={form.body}
+            onChange={(event) => setForm({ ...form, body: event.target.value })}
+          />
 
           <div className="actions">
-            <button type="submit">{editingId ? "Save note" : "Add note"}</button>
-            {editingId && <button type="button" className="secondary" onClick={reset}>Cancel</button>}
+            <button type="submit">
+              {editingId ? "Save note" : "Add note"}
+            </button>
+            {editingId && (
+              <button type="button" className="secondary" onClick={reset}>
+                Cancel
+              </button>
+            )}
           </div>
-          <p className="message">{message}</p>
+          <p role="status" className="message">
+            {message}
+          </p>
         </form>
 
         <section className="panel">
@@ -191,12 +226,26 @@ function NotesScreen({ user, onLogout }) {
                 <h3>{note.title}</h3>
                 <p>{note.body || "No body yet."}</p>
                 <div className="actions">
-                  <button type="button" className="secondary" onClick={() => startEdit(note)}>Edit</button>
-                  <button type="button" className="danger" onClick={() => remove(note.id)}>Delete</button>
+                  <button
+                    type="button"
+                    className="secondary"
+                    onClick={() => startEdit(note)}
+                  >
+                    Edit
+                  </button>
+                  <button
+                    type="button"
+                    className="danger"
+                    onClick={() => remove(note.id)}
+                  >
+                    Delete
+                  </button>
                 </div>
               </article>
             ))}
-            {notes.length === 0 && <p className="muted">No notes yet — only you can see these.</p>}
+            {notes.length === 0 && (
+              <p className="muted">No notes yet — only you can see these.</p>
+            )}
           </div>
         </section>
       </section>

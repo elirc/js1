@@ -23,6 +23,7 @@ let books = loadBooks();
 let editingId = null;
 let searchTerm = "";
 let sortMode = "title";
+let statusFilter = "All";
 
 const form = document.querySelector("#book-form");
 const idInput = document.querySelector("#book-id");
@@ -38,6 +39,11 @@ const searchInput = document.querySelector("#search");
 const sortInput = document.querySelector("#sort");
 const booksList = document.querySelector("#books");
 const empty = document.querySelector("#empty");
+
+document.querySelector("#status-filter").addEventListener("change", (event) => {
+  statusFilter = event.target.value;
+  renderBooks();
+});
 
 form.addEventListener("submit", saveBook);
 cancelButton.addEventListener("click", resetForm);
@@ -127,18 +133,23 @@ function getVisibleBooks() {
   return [...books]
     .filter((book) => {
       const searchable = `${book.title} ${book.author} ${book.status} ${book.notes}`.toLowerCase();
-      return searchable.includes(searchTerm);
+      return (statusFilter === "All" || book.status === statusFilter) && searchable.includes(searchTerm);
     })
     .sort((a, b) => {
+      // Ids are coerced with String() because records written by an older build
+      // (or hand-edited in localStorage) can carry a numeric id, and Number has
+      // no localeCompare. The tie-break must never be the thing that throws.
+      const byId = String(a.id).localeCompare(String(b.id));
       if (sortMode === "rating") {
-        return Number(b.rating) - Number(a.rating);
+        return Number(b.rating) - Number(a.rating) || a.title.localeCompare(b.title) || byId;
       }
-      return a[sortMode].localeCompare(b[sortMode]);
+      return String(a[sortMode]).localeCompare(String(b[sortMode])) || byId;
     });
 }
 
 function renderBooks() {
   const visibleBooks = getVisibleBooks();
+  document.querySelector("#reading-summary").textContent = `Showing ${visibleBooks.length} of ${books.length} books. ${books.filter((book) => book.status === "Finished").length} finished overall.`;
   booksList.innerHTML = "";
   empty.hidden = visibleBooks.length > 0;
 

@@ -16,3 +16,7 @@ A React + Node CRUD app for managing courses and student counts.
 - Create an enrollment endpoint
 - Add pagination to `/api/courses`
 - Store records in SQLite or PostgreSQL
+
+## Junior SWE learning course
+
+[Start the detailed Astra upskilling course](astraupskill/README.md): normalization, uniqueness and whole-number invariants, with a codebase map, worked implementation, executable examples, debugging labs, exercises and solution discussions.

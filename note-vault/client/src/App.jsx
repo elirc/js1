@@ -46,15 +46,17 @@ export default function App() {
   }
 
   async function pin(id) {
-    await togglePin(id);
-    await refresh();
+    try { await togglePin(id); await refresh(); }
+    catch (error) { setMessage(error.message); }
   }
 
   async function remove(id) {
-    await deleteNote(id);
-    if (editingId === id) resetForm();
-    setMessage("Note removed from disk.");
-    await refresh();
+    try {
+      await deleteNote(id);
+      if (editingId === id) resetForm();
+      setMessage("Note removed from disk.");
+      await refresh();
+    } catch (error) { setMessage(error.message); }
   }
 
   function resetForm() {
@@ -74,17 +76,17 @@ export default function App() {
 
       <section className="grid">
         <form className="panel" onSubmit={handleSubmit}>
-          <label>Title</label>
-          <input value={form.title} onChange={(event) => setForm({ ...form, title: event.target.value })} />
+          <label htmlFor="note-title">Title</label>
+          <input id="note-title" value={form.title} onChange={(event) => setForm({ ...form, title: event.target.value })} />
 
-          <label>Body</label>
-          <textarea rows="8" value={form.body} onChange={(event) => setForm({ ...form, body: event.target.value })} />
+          <label htmlFor="note-body">Body</label>
+          <textarea id="note-body" rows="8" value={form.body} onChange={(event) => setForm({ ...form, body: event.target.value })} />
 
           <div className="actions">
             <button type="submit">{editingId ? "Save note" : "Add note"}</button>
             {editingId && <button type="button" className="secondary" onClick={resetForm}>Cancel</button>}
           </div>
-          <p className="message">{message}</p>
+          <p role="status" className="message">{message}</p>
         </form>
 
         <section className="panel">

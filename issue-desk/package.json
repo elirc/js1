@@ -6,15 +6,17 @@
   "scripts": {
     "dev:server": "node server/server.js",
     "dev:client": "vite --host 127.0.0.1",
-    "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\""
+    "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
+    "test": "node --test test/*.test.js",
+    "build": "vite build"
   },
   "dependencies": {
-    "@vitejs/plugin-react": "latest",
-    "concurrently": "latest",
-    "cors": "latest",
-    "express": "latest",
-    "vite": "latest",
-    "react": "latest",
-    "react-dom": "latest"
+    "@vitejs/plugin-react": "^6.1.1",
+    "concurrently": "^9.2.1",
+    "cors": "^2.8.6",
+    "express": "^4.22.2",
+    "vite": "^8.2.2",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
   }
 }

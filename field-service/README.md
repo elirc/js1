@@ -12,3 +12,7 @@ A TypeScript + React + Node + Postgres CRUD study scaffold for field visits, tec
 - React controlled forms and typed API wrappers
 
 No dependencies are installed; this is source for learning.
+
+## Junior SWE learning course
+
+[Start the detailed Astra upskilling course](astraupskill/README.md): runtime validation, stable pagination and repeat-safe status history, with a codebase map, worked implementation, executable examples, debugging labs, exercises and solution discussions.

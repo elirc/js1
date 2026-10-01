@@ -57,8 +57,10 @@ function actionButton(label, variant, onClick) {
 
 export async function copyToClipboard(text) {
   if (navigator.clipboard?.writeText) {
-    await navigator.clipboard.writeText(text);
-    return true;
+    try {
+      await navigator.clipboard.writeText(text);
+      return true;
+    } catch { return false; }
   }
   return false;
 }

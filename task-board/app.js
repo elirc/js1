@@ -19,8 +19,10 @@ const starterTasks = [
   }
 ];
 
+const savedBoard = loadBoard();
 const state = {
-  tasks: loadTasks(),
+  tasks: savedBoard.tasks,
+  deleted: savedBoard.deleted,
   query: "",
   status: "All",
   editingId: null
@@ -41,6 +43,8 @@ const statusFilter = document.querySelector("#status-filter");
 const taskList = document.querySelector("#task-list");
 const taskCount = document.querySelector("#task-count");
 const emptyState = document.querySelector("#empty-state");
+const undoButton = document.querySelector("#undo-delete");
+undoButton.addEventListener("click", undoDelete);
 
 form.addEventListener("submit", handleSubmit);
 cancelButton.addEventListener("click", resetForm);
@@ -55,13 +59,19 @@ statusFilter.addEventListener("change", (event) => {
 
 render();
 
-function loadTasks() {
+function loadBoard() {
   const saved = localStorage.getItem(STORAGE_KEY);
-  return saved ? JSON.parse(saved) : starterTasks;
+  if (!saved) return { tasks: starterTasks, deleted: null };
+  const parsed = JSON.parse(saved);
+  // Existing installations stored only an array. Upgrade without discarding it.
+  if (Array.isArray(parsed)) return { tasks: parsed, deleted: null };
+  return { tasks: parsed.tasks, deleted: parsed.deleted ?? null };
 }
 
+// Raw, unguarded write. Application paths go through commitBoard; this remains
+// for fixtures that mutate `state` directly (see test/undo.test.cjs case 2).
 function saveTasks() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(state.tasks));
+  localStorage.setItem(STORAGE_KEY, JSON.stringify({ version: 2, tasks: state.tasks, deleted: state.deleted }));
 }
 
 function handleSubmit(event) {
@@ -81,15 +91,14 @@ function handleSubmit(event) {
     return;
   }
 
-  if (state.editingId) {
-    state.tasks = state.tasks.map((item) => item.id === state.editingId ? task : item);
-    showMessage("Task updated.");
-  } else {
-    state.tasks.unshift(task);
-    showMessage("Task added.");
-  }
+  const nextTasks = state.editingId
+    ? state.tasks.map((item) => item.id === state.editingId ? task : item)
+    : [task, ...state.tasks];
 
-  saveTasks();
+  // Create and edit obey the same persist-then-publish rule as delete and undo.
+  if (!commitBoard(nextTasks, state.deleted)) return;
+
+  showMessage(state.editingId ? "Task updated." : "Task added.");
   resetForm();
   render();
 }
@@ -110,11 +119,43 @@ function editTask(id) {
   titleInput.focus();
 }
 
+function commitBoard(tasks, deleted) {
+  try {
+    // Persist first. A quota/security error must not consume an undo or hide a task.
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ version: 2, tasks, deleted }));
+  } catch {
+    showMessage("Could not save this change. Your task and undo history are unchanged.");
+    return false;
+  }
+  state.tasks = tasks;
+  state.deleted = deleted;
+  return true;
+}
+
 function deleteTask(id) {
-  state.tasks = state.tasks.filter((task) => task.id !== id);
-  saveTasks();
+  const index = state.tasks.findIndex((task) => task.id === id);
+  if (index < 0) return;
+  const deleted = { task: state.tasks[index], index };
+  if (!commitBoard(state.tasks.filter((task) => task.id !== id), deleted)) return;
   resetForm();
-  showMessage("Task deleted.");
+  showMessage("Task deleted. You can undo the most recent deletion, even after reload.");
+  render();
+}
+
+function undoDelete() {
+  if (!state.deleted) return;
+  const { task, index } = state.deleted;
+  if (state.tasks.some((item) => item.id === task.id)) {
+    showMessage("That task already exists; undo would create a duplicate.");
+    return;
+  }
+  const tasks = [...state.tasks];
+  tasks.splice(Math.min(index, tasks.length), 0, task);
+  if (!commitBoard(tasks, null)) return;
+  // Reveal the restored task even if an old filter would hide it.
+  state.query = ""; state.status = "All";
+  searchInput.value = ""; statusFilter.value = "All";
+  showMessage("Task restored.");
   render();
 }
 
@@ -135,6 +176,7 @@ function getVisibleTasks() {
 }
 
 function render() {
+  undoButton.disabled = !state.deleted;
   const tasks = getVisibleTasks();
   taskList.innerHTML = "";
   taskCount.textContent = tasks.length;

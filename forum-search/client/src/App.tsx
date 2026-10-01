@@ -122,16 +122,16 @@ export default function App() {
 
           <form className="panel" onSubmit={handleSubmit}>
             <h2>New thread</h2>
-            <label>Title</label>
-            <input value={form.title} onChange={(event) => setForm({ ...form, title: event.target.value })} />
+            <label htmlFor="field-title">Title</label>
+            <input id="field-title" value={form.title} onChange={(event) => setForm({ ...form, title: event.target.value })} />
 
-            <label>Body</label>
-            <textarea rows={4} value={form.body} onChange={(event) => setForm({ ...form, body: event.target.value })} />
+            <label htmlFor="field-body">Body</label>
+            <textarea id="field-body" rows={4} value={form.body} onChange={(event) => setForm({ ...form, body: event.target.value })} />
 
             <div className="field-row">
               <div>
-                <label>Author</label>
-                <select value={form.authorId} onChange={(event) => setForm({ ...form, authorId: event.target.value })}>
+                <label htmlFor="field-author-id">Author</label>
+                <select id="field-author-id" value={form.authorId} onChange={(event) => setForm({ ...form, authorId: event.target.value })}>
                   {users.map((user) => <option key={user.id} value={user.id}>{user.username}</option>)}
                 </select>
               </div>
@@ -142,7 +142,7 @@ export default function App() {
             </div>
 
             <button type="submit">Post thread</button>
-            <p className="message">{message}</p>
+            <p role="status" className="message">{message}</p>
           </form>
         </div>
 

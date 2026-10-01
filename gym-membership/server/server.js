@@ -1,7 +1,8 @@
-﻿import express from "express";
+﻿import { pathToFileURL } from "node:url";
+import express from "express";
 import cors from "cors";
 
-const app = express();
+export const app = express();
 const port = Number(process.env.PORT || 4222);
 const STATUSES = ["Lead", "Active", "Paused", "Cancelled"];
 const CATEGORIES = ["Strength", "Cardio", "Yoga", "Personal Training"];
@@ -9,6 +10,11 @@ const SORTABLE = ["title", "owner", "category", "status", "priority", "dueDate",
 
 app.use(cors());
 app.use(express.json());
+app.use((req,res,next) => {
+  if (["POST","PUT","PATCH"].includes(req.method) && (!req.body || typeof req.body !== "object" || Array.isArray(req.body)))
+    return res.status(400).json({ error: "Send a JSON object." });
+  next();
+});
 
 const repository = createRepository();
 
@@ -26,7 +32,7 @@ app.put("/api/memberships/:id", validateItem, (req, res) => {
   res.json(item);
 });
 app.patch("/api/memberships/:id/status", (req, res) => {
-  const status = String(req.body.status || "");
+  const status = req.body.status;
   if (!STATUSES.includes(status)) return res.status(400).json({ error: "Choose a valid status." });
   const item = repository.setStatus(req.params.id, status);
   if (!item) return res.status(404).json({ error: "Membership not found." });
@@ -42,14 +48,26 @@ app.get("/api/memberships/:id/activity", (req, res) => {
   res.json(repository.listActivity(req.params.id));
 });
 app.post("/api/memberships/:id/activity", (req, res) => {
+  if (typeof req.body.body !== "string" || !req.body.body.trim() || req.body.body.length > 2000 ||
+      req.body.kind !== undefined && (typeof req.body.kind !== "string" || !req.body.kind.trim() || req.body.kind.length > 40))
+    return res.status(400).json({ error: "Activity needs text of 1-2000 characters and an optional short kind." });
   const entry = repository.addActivity(req.params.id, req.body);
   if (!entry) return res.status(404).json({ error: "Membership not found or activity was empty." });
   res.status(201).json(entry);
 });
 
-app.listen(port, () => console.log("Gym Membership API listening on http://localhost:" + port));
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) app.listen(port, () => console.log("Gym Membership API listening on http://localhost:" + port));
 
 function validateItem(req, res, next) {
+  const body = req.body;
+  if (["title","owner"].some(key => typeof body[key] !== "string" || body[key].trim().length > 200) ||
+      ["notes","dueDate","priority","category","status"].some(key => body[key] !== undefined && typeof body[key] !== "string"))
+    return res.status(400).json({ error: "Use text for record fields; title and owner allow at most 200 characters." });
+  if (body.amount !== undefined && (typeof body.amount !== "number" && typeof body.amount !== "string" || String(body.amount).trim() === ""))
+    return res.status(400).json({ error: "Amount must be a number." });
+  if (body.dueDate && !validDate(body.dueDate)) return res.status(400).json({ error: "Use a real date in YYYY-MM-DD format." });
+  if (body.notes?.length > 10000 || body.priority && !["Low","Medium","High","Critical"].includes(body.priority))
+    return res.status(400).json({ error: "Choose a valid priority and keep notes under 10000 characters." });
   const input = normalizeItem(req.body);
   if (input.title.length < 2) return res.status(400).json({ error: "Title must be at least 2 characters." });
   if (input.owner.length < 2) return res.status(400).json({ error: "Owner must be at least 2 characters." });
@@ -63,8 +81,8 @@ function normalizeItem(input) {
   return { title: String(input.title || "").trim(), owner: String(input.owner || "").trim(), category: String(input.category || CATEGORIES[0]).trim(), status: String(input.status || STATUSES[0]).trim(), amount: Number(input.amount || 0), priority: String(input.priority || "Medium").trim(), dueDate: String(input.dueDate || "").trim(), notes: String(input.notes || "").trim() };
 }
 function normalizeQuery(query) {
-  const page = Math.max(1, Number(query.page) || 1);
-  const pageSize = Math.min(25, Math.max(1, Number(query.pageSize) || 6));
+  const page = pageNumber(query.page, 1, 1000000);
+  const pageSize = pageNumber(query.pageSize, 6, 25);
   const sort = SORTABLE.includes(query.sort) ? query.sort : "createdAt";
   const dir = query.dir === "asc" ? "asc" : "desc";
   return { search: String(query.search || "").trim().toLowerCase(), status: String(query.status || "all"), category: String(query.category || "all"), page, pageSize, sort, dir };
@@ -78,9 +96,10 @@ function createRepository() {
         const haystack = (item.title + " " + item.owner + " " + item.category + " " + item.status + " " + item.priority + " " + item.notes).toLowerCase();
         return (!search || haystack.includes(search)) && (status === "all" || item.status === status) && (category === "all" || item.category === category);
       });
-      result = result.sort((a, b) => compareValues(a[sort], b[sort], dir));
+      result = result.sort((a, b) => compareValues(a[sort], b[sort], dir) || a.id.localeCompare(b.id));
       const total = result.length;
       const totalPages = Math.max(1, Math.ceil(total / pageSize));
+      page = Math.min(page, totalPages);
       const start = (page - 1) * pageSize;
       return { items: result.slice(start, start + pageSize), total, totalPages, page, pageSize, sort, dir };
     },
@@ -94,7 +113,14 @@ function createRepository() {
     find(id) { return items.find((item) => item.id === id); },
     create(input) { const item = { id: crypto.randomUUID(), ...input, createdAt: now(), updatedAt: now() }; items.unshift(item); activity.unshift(activityEntry(item.id, "created", "Created " + item.title)); return item; },
     update(id, input) { const existing = this.find(id); if (!existing) return null; const updated = { ...existing, ...input, updatedAt: now() }; items = items.map((item) => item.id === id ? updated : item); activity.unshift(activityEntry(id, "updated", "Updated " + updated.title)); return updated; },
-    setStatus(id, status) { const existing = this.find(id); if (!existing) return null; return this.update(id, { ...existing, status }); },
+    setStatus(id, status) {
+      const existing = this.find(id); if (!existing) return null;
+      if (existing.status === status) return existing;
+      const updated = { ...existing, status, updatedAt: now() };
+      const entry = activityEntry(id, "status", "Changed status from " + existing.status + " to " + status);
+      items = items.map(item => item.id === id ? updated : item); activity.unshift(entry);
+      return updated;
+    },
     remove(id) { const existing = this.find(id); if (!existing) return false; items = items.filter((item) => item.id !== id); activity.unshift(activityEntry(id, "deleted", "Deleted " + existing.title)); return true; },
     listActivity(itemId) { return activity.filter((entry) => entry.itemId === itemId).sort((a, b) => b.createdAt.localeCompare(a.createdAt)); },
     addActivity(itemId, input) { if (!this.find(itemId)) return null; const body = String(input.body || "").trim(); if (!body) return null; const entry = activityEntry(itemId, String(input.kind || "note"), body); activity.unshift(entry); return entry; }
@@ -104,3 +130,12 @@ function seed(input) { return { id: crypto.randomUUID(), ...input, createdAt: no
 function activityEntry(itemId, kind, body) { return { id: crypto.randomUUID(), itemId, kind, body, createdAt: now() }; }
 function compareValues(left, right, dir) { const factor = dir === "asc" ? 1 : -1; if (typeof left === "number" && typeof right === "number") return (left - right) * factor; return String(left).localeCompare(String(right)) * factor; }
 function now() { return new Date().toISOString(); }
+
+function validDate(value) {
+  return typeof value === "string" && /^\d{4}-\d{2}-\d{2}$/.test(value) &&
+    !Number.isNaN(Date.parse(value + "T00:00:00Z")) && new Date(value + "T00:00:00Z").toISOString().slice(0,10) === value;
+}
+function pageNumber(value, fallback, maximum) {
+  const number = Number(value ?? fallback);
+  return Number.isSafeInteger(number) && number > 0 ? Math.min(number,maximum) : fallback;
+}

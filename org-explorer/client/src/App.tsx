@@ -180,7 +180,7 @@ export default function App() {
           ) : (
             <p className="muted">Select a node to inspect its depth, descendants, and ancestry.</p>
           )}
-          <p className="message">{message}</p>
+          <p role="status" className="message">{message}</p>
         </section>
       </section>
     </main>

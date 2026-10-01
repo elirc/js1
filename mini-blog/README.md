@@ -35,3 +35,7 @@ DELETE /api/posts/:postId/comments/:commentId   delete a comment
 - Add nested replies (comments on comments)
 - Add `GET /api/posts?author=` filtering
 - Move to a relational database and use a real `JOIN`
+
+## Junior SWE learning course
+
+[Start the detailed Astra upskilling course](astraupskill/README.md): relationships and validated text boundaries, with a codebase map, worked implementation, executable examples, debugging labs, exercises and solution discussions.

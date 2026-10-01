@@ -1,6 +1,10 @@
 body {
   margin: 0;
-  font-family: Inter, Segoe UI, Arial, sans-serif;
+  font-family:
+    Inter,
+    Segoe UI,
+    Arial,
+    sans-serif;
   background: #f4f7fb;
   color: #182033;
 }
@@ -33,8 +37,13 @@ body {
   align-items: start;
 }
 
-.stack { display: grid; gap: 18px; }
-.panel { padding: 18px; }
+.stack {
+  display: grid;
+  gap: 18px;
+}
+.panel {
+  padding: 18px;
+}
 
 .eyebrow {
   margin: 0 0 6px;
@@ -44,11 +53,21 @@ body {
   text-transform: uppercase;
 }
 
-h1, h2, h3, p { margin-top: 0; }
+h1,
+h2,
+h3,
+p {
+  margin-top: 0;
+}
 
-label { display: block; margin: 12px 0 6px; font-weight: 750; }
+label {
+  display: block;
+  margin: 12px 0 6px;
+  font-weight: 750;
+}
 
-input, select {
+input,
+select {
   width: 100%;
   box-sizing: border-box;
   border: 1px solid #d8e0ec;
@@ -57,7 +76,11 @@ input, select {
   font: inherit;
 }
 
-.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.field-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
 
 button {
   border: 0;
@@ -80,18 +103,29 @@ button.link {
   text-decoration: underline;
 }
 
-.stock { width: 100%; border-collapse: collapse; }
+.stock {
+  width: 100%;
+  border-collapse: collapse;
+}
 
-.stock th, .stock td {
+.stock th,
+.stock td {
   padding: 10px 12px;
   text-align: left;
   border-bottom: 1px solid #e4e9f1;
 }
 
-.stock th { background: #f3f6fb; }
-.stock .num { text-align: right; font-variant-numeric: tabular-nums; }
+.stock th {
+  background: #f3f6fb;
+}
+.stock .num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
 
-.stock tr.low td { background: #fff6f4; }
+.stock tr.low td {
+  background: #fff6f4;
+}
 
 .flag {
   margin-left: 8px;
@@ -103,9 +137,17 @@ button.link {
   background: #ffe0e0;
 }
 
-.ledger { margin-top: 18px; }
+.ledger {
+  margin-top: 18px;
+}
 
-.ledger ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.ledger ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+}
 
 .ledger li {
   display: grid;
@@ -117,15 +159,61 @@ button.link {
   background: #f7f9fc;
 }
 
-.delta { font-weight: 800; font-variant-numeric: tabular-nums; }
-.delta.pos { color: #145049; }
-.delta.neg { color: #aa2f2f; }
+.delta {
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+.delta.pos {
+  color: #145049;
+}
+.delta.neg {
+  color: #aa2f2f;
+}
 
-.muted, .message { color: #657084; }
-.message { min-height: 20px; font-weight: 700; }
-.small { font-size: 0.8rem; }
+.muted,
+.message {
+  color: #657084;
+}
+.message {
+  min-height: 20px;
+  font-weight: 700;
+}
+.small {
+  font-size: 0.8rem;
+}
 
 @media (max-width: 920px) {
-  .hero, .grid { grid-template-columns: 1fr; flex-direction: column; align-items: stretch; }
-  .ledger li { grid-template-columns: 1fr; }
+  .hero,
+  .grid {
+    grid-template-columns: 1fr;
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .ledger li {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Keep forms and ledger tables usable on narrow learning screens. */
+.panel,
+.grid > *,
+.field-row > * {
+  min-width: 0;
+}
+input,
+select,
+textarea {
+  max-width: 100%;
+  box-sizing: border-box;
+}
+@media (max-width: 600px) {
+  .field-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .panel {
+    overflow-x: auto;
+  }
+  .account {
+    flex-wrap: wrap;
+  }
 }

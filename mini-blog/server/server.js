@@ -1,11 +1,17 @@
+import { pathToFileURL } from "node:url";
 import express from "express";
 import cors from "cors";
 
-const app = express();
+export const app = express();
 const port = 4107;
 
 app.use(cors());
 app.use(express.json());
+app.use((req,res,next) => {
+  if (["POST","PUT","PATCH"].includes(req.method) && (!req.body || typeof req.body !== "object" || Array.isArray(req.body)))
+    return res.status(400).json({ error: "Send a JSON object." });
+  next();
+});
 
 const repository = createBlogRepository();
 
@@ -66,32 +72,19 @@ app.delete("/api/posts/:postId/comments/:commentId", (req, res) => {
   res.status(204).send();
 });
 
-app.listen(port, () => {
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) app.listen(port, () => {
   console.log(`Mini Blog API listening on http://localhost:${port}`);
 });
 
 function validatePost(req, res, next) {
   const { title, author, body } = req.body;
-  if (!title || title.trim().length < 3) {
-    return res.status(400).json({ error: "Title must be at least 3 characters." });
-  }
-  if (!author || author.trim().length < 2) {
-    return res.status(400).json({ error: "Author must be at least 2 characters." });
-  }
-  if (!body || body.trim().length < 1) {
-    return res.status(400).json({ error: "Body cannot be empty." });
-  }
+  if (!isText(title,3) || !isText(author,2) || !isText(body,1,20000)) return res.status(400).json({ error: "Use bounded text for title, author and body." });
   next();
 }
 
 function validateComment(req, res, next) {
   const { author, text } = req.body;
-  if (!author || author.trim().length < 2) {
-    return res.status(400).json({ error: "Comment author must be at least 2 characters." });
-  }
-  if (!text || text.trim().length < 1) {
-    return res.status(400).json({ error: "Comment text cannot be empty." });
-  }
+  if (!isText(author,2) || !isText(text,1,2000)) return res.status(400).json({ error: "Use an author name and comment text of at most 2000 characters." });
   next();
 }
 
@@ -187,3 +180,5 @@ function createBlogRepository() {
     }
   };
 }
+
+function isText(value, min = 0, max = 200) { return typeof value === "string" && value.trim().length >= min && value.length <= max; }

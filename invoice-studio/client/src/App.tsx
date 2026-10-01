@@ -102,8 +102,8 @@ export default function App() {
         <form className="panel" onSubmit={handleSubmit}>
           <h2>New invoice</h2>
 
-          <label>Client</label>
-          <select value={clientId} onChange={(event) => setClientId(event.target.value)} required>
+          <label htmlFor="lesson-field-1">Client</label>
+          <select id="lesson-field-1" value={clientId} onChange={(event) => setClientId(event.target.value)} required>
             <option value="" disabled>Select a client…</option>
             {clients.map((client) => (
               <option key={client.id} value={client.id}>{client.name}</option>
@@ -119,14 +119,14 @@ export default function App() {
 
           <div className="field-row">
             <div>
-              <label>Status</label>
-              <select value={status} onChange={(event) => setStatusValue(event.target.value as InvoiceStatus)}>
+              <label htmlFor="lesson-field-2">Status</label>
+              <select id="lesson-field-2" value={status} onChange={(event) => setStatusValue(event.target.value as InvoiceStatus)}>
                 {STATUSES.map((option) => <option key={option} value={option}>{option}</option>)}
               </select>
             </div>
             <div>
-              <label>Issued</label>
-              <input type="date" value={issuedDate} onChange={(event) => setIssuedDate(event.target.value)} />
+              <label htmlFor="lesson-field-3">Issued</label>
+              <input id="lesson-field-3" type="date" value={issuedDate} onChange={(event) => setIssuedDate(event.target.value)} />
             </div>
             <div>
               <label>Tax %</label>
@@ -170,7 +170,7 @@ export default function App() {
           </dl>
 
           <button type="submit">Create invoice</button>
-          <p className="message">{message}</p>
+          <p role="status" className="message">{message}</p>
         </form>
 
         <section className="panel">

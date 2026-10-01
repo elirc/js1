@@ -120,3 +120,14 @@ button.danger { background: #aa2f2f; margin-top: 0; }
   .hero, .grid { grid-template-columns: 1fr; flex-direction: column; align-items: stretch; }
   .schedule li { grid-template-columns: 1fr; }
 }
+
+/* Full-precision local date inputs need the form width to remain readable. */
+.field-row { grid-template-columns: minmax(0, 1fr); }
+.field-row > div { min-width: 0; }
+input { min-width: 0; }
+.schedule li { grid-template-columns: minmax(140px, auto) minmax(0, 1fr) auto auto auto; }
+.schedule .title, .schedule .small { overflow-wrap: anywhere; }
+.toolbar { flex-wrap: wrap; }
+@media (max-width: 900px) {
+  .schedule li { grid-template-columns: minmax(0, 1fr); }
+}

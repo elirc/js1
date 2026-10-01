@@ -42,3 +42,7 @@ npm run dev          # API on :4117, client on :5117
 - Schedule refreshes with `pg_cron`, or refresh on a Node interval.
 - Add a funnel (view → cart → purchase) with conditional aggregation.
 - Compare `RANK()` vs `DENSE_RANK()` vs `ROW_NUMBER()` on the leaderboard.
+
+## Junior SWE learning course
+
+[Start the detailed Astra upskilling course](astraupskill/README.md): calendar buckets, window functions and derived data, with a codebase map, worked implementation, executable examples, debugging labs, exercises and solution discussions.

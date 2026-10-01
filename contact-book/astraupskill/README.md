@@ -1,0 +1,62 @@
+# Contact Book: duplicate-email validation
+
+This is a hands-on course for a junior software engineer using the actual project in `JS1/contact-book`. The central skill is **normalization, validation and edit identity**. The implementation is already present: use it as a worked example, then recreate a small variation independently.
+
+## What you will be able to do
+
+- Explain the purpose of the changed code and the data it owns.
+- Trace an action from input through validation, state/persistence and output.
+- Predict a success case and a failure case before running either.
+- Read the regression tests and explain what each assertion proves.
+- Implement a related change without copying the worked answer.
+- Explain a limitation and a reasonable next step without overstating readiness.
+
+## Prerequisites
+
+Be comfortable with variables, arrays, objects, functions, conditionals and calling a function. For React projects, review props, state and event handlers. For API projects, review JSON, HTTP methods and promises, then learn the relevant SQL operations as you trace the request. You do not need to memorize the whole repository first.
+
+## Start the project
+
+Serve this folder over HTTP and open the printed URL: `npx serve .` or `python -m http.server 8000`. Do not double-click `index.html`. `app.js` reads `localStorage` at module load (`app.js:22` calls `loadContacts`), and over a `file://` origin several browsers either block storage outright or share one origin with every other local page, so the list looks empty or shows someone else's records. The delivered browser check used a local HTTP server. For the automated DOM tests, run `npm install`, then `npm test` from this project folder.
+
+The commands are run from this project’s folder, not from the Desktop inventory repository. Existing README/Fable material remains available. This folder teaches the implemented change and points to executable source and tests rather than replacing older guides.
+
+### Toolchain
+
+This course was delivered and verified on **Node 22.16.0**, **npm 10**. Use the same major versions: newer patch releases are fine, older majors are untested here.
+
+`npm test` from the project root runs `node --test test/*.test.cjs`. npm runs scripts through `cmd.exe` on Windows, and `cmd.exe` does not expand the `test/*.test.cjs` glob; neither does PowerShell for a native command. Node's own test runner expands the pattern (Node 21+), so `npm test` works on Node 22 - but on an older Node, or with a different runner, you will see "no test files". The shell-independent equivalent is:
+
+```powershell
+node --test test/duplicates.test.cjs
+```
+
+## Reading and practice order
+
+1. [Codebase map and reading order](01-CODEBASE-MAP.md)
+2. [Concepts explained from first principles](02-CONCEPTS.md)
+3. [Worked implementation and examples](03-WORKED-CHANGE.md)
+4. [Tests, failure cases and debugging](04-TESTING-AND-DEBUGGING.md)
+5. [Guided and independent exercises](05-PRACTICE.md)
+6. [Solutions, tradeoffs and review rubric](06-SOLUTIONS-AND-REVIEW.md)
+7. [Actual verification results and limits](VERIFICATION.md)
+
+8. [Step-by-step trace lab and concrete examples](07-TRACE-LAB.md)
+
+## Your first session
+
+1. Open the app or its tests and reproduce one normal workflow.
+2. Read chapter 1 while keeping [app.js](../app.js) open.
+3. Write a prediction for the worked example in chapter 3 before executing it.
+4. Run the focused test suite and explain one assertion aloud.
+5. Complete the first practice exercise, then check the solution discussion.
+
+Keep a short learning log with four fields: prediction, observed result, explanation and next question. A mismatch is useful evidence: find the exact layer where your mental model diverged from the program. Use a disposable browser profile or local test database for failure experiments so your own records are not part of the fixture.
+
+## Scope
+
+Creates and edits reject case-insensitive, whitespace-normalized duplicates in another record. The message identifies the existing contact, marks the email invalid for assistive technology, focuses it, and leaves stored data unchanged. Every write path - create, edit and delete - now persists through `commitContacts` before publishing to the in-memory array, so a failed `localStorage` write leaves the list, the storage value and the form exactly as they were.
+
+**Known gap: contacts that were already duplicates.** The rule is enforced *on write only*. A storage value that already contains `Ada@Example.com` and `ada@example.com` is loaded, rendered and edited without complaint; nothing detects, reports or merges it, and editing either record keeps working because the `item.id !== editingId` term excludes only the record under edit, not its twin. That is a deliberate boundary - silently merging two people's records is worse than showing both - and closing it properly is exercise 3 in chapter 5. Assume the same is true of any uniqueness rule you add to an existing system: it constrains the future, not the past.
+
+This is one bounded improvement, not certification of every feature. Read VERIFICATION.md for checks actually executed. Exercises are intentionally future practice; do not confuse them with completed implementation.

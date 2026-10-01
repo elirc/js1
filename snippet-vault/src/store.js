@@ -28,15 +28,32 @@ function load() {
   return saved ? JSON.parse(saved) : starterSnippets;
 }
 
-function persist() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(snippets));
+function commit(next) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+  snippets = next;
 }
 
 function parseTags(raw) {
-  return raw
-    .split(",")
-    .map((tag) => tag.trim())
-    .filter(Boolean);
+  const seen = new Set();
+  return raw.split(",").map((tag) => tag.trim()).filter((tag) => {
+    const key = tag.toLowerCase();
+    if (!key || seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
+// The two errors this module raises on purpose. Their wording is meant for a
+// person, so a UI may show them as-is; anything else (a storage quota failure,
+// a bug) must not be shown raw. Exported so main.js does not have to keep a
+// second copy of the list, and so this rule can be tested without a DOM.
+export const STORE_ERROR_MESSAGES = Object.freeze([
+  "Add a title and some code.",
+  "This snippet no longer exists."
+]);
+
+export function isUserFacingError(error) {
+  return error instanceof Error && STORE_ERROR_MESSAGES.includes(error.message);
 }
 
 export function getSnippet(id) {
@@ -60,17 +77,14 @@ export function saveSnippet(input) {
     code: input.code
   };
 
-  if (input.id) {
-    snippets = snippets.map((snippet) =>
-      snippet.id === input.id ? { ...snippet, ...base } : snippet
-    );
-  } else {
-    snippets.unshift({ id: crypto.randomUUID(), createdAt: new Date().toISOString(), ...base });
-  }
-  persist();
+  if (!base.title || !base.code.trim()) throw new Error("Add a title and some code.");
+  if (input.id && !snippets.some((item) => item.id === input.id)) throw new Error("This snippet no longer exists.");
+  const next = input.id
+    ? snippets.map((snippet) => snippet.id === input.id ? { ...snippet, ...base } : snippet)
+    : [{ id: crypto.randomUUID(), createdAt: new Date().toISOString(), ...base }, ...snippets];
+  commit(next);
 }
 
 export function deleteSnippet(id) {
-  snippets = snippets.filter((snippet) => snippet.id !== id);
-  persist();
+  commit(snippets.filter((snippet) => snippet.id !== id));
 }

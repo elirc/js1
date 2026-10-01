@@ -40,3 +40,7 @@ This is a teaching scaffold, not production auth:
 - Add token expiry and refresh
 - Persist users and notes (combine with the `note-vault` file approach)
 - Add an HTTP-only cookie option instead of `localStorage`
+
+## Junior SWE learning course
+
+[Start the detailed Astra upskilling course](astraupskill/README.md): authorizing records and rejecting malformed JSON, with a codebase map, worked implementation, executable examples, debugging labs, exercises and solution discussions.

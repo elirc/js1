@@ -44,3 +44,7 @@ npm run dev          # HTTP + WS on :4115, client on :5115
 - Add "message delivered" acks or edit/delete with more NOTIFY channels.
 - `NOTIFY` payloads are capped at ~8 KB — for large data, notify just an id and
   have listeners `SELECT` the row.
+
+## Junior SWE learning course
+
+[Start the detailed Astra upskilling course](astraupskill/README.md): HTTP boundaries, WebSocket messages and database notifications, with a codebase map, worked implementation, executable examples, debugging labs, exercises and solution discussions.

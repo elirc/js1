@@ -25,3 +25,7 @@ handling** — the one fundamental the other projects skip.
    accurate even if the tab is throttled in the background.
 
 Open `index.html` in a browser to run it.
+
+## Junior SWE learning course
+
+[Start the detailed Astra upskilling course](astraupskill/README.md): deadlines, delayed callbacks and one-time completion, with a codebase map, worked implementation, executable examples, debugging labs, exercises and solution discussions.

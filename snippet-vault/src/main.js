@@ -1,7 +1,7 @@
 // main.js — the entry point. It wires DOM events to the store and the
 // rendering helpers. Run via <script type="module"> in index.html.
 
-import { deleteSnippet, getSnippet, listSnippets, saveSnippet } from "./store.js";
+import { deleteSnippet, getSnippet, isUserFacingError, listSnippets, saveSnippet } from "./store.js";
 import { buildCard, copyToClipboard } from "./dom.js";
 
 const view = { query: "", language: "All", editingId: null };
@@ -41,13 +41,25 @@ function handleSubmit(event) {
     return;
   }
 
-  saveSnippet({
-    id: view.editingId,
-    title: titleInput.value,
-    language: languageInput.value,
-    tags: tagsInput.value,
-    code: codeInput.value
-  });
+  try {
+    saveSnippet({
+      id: view.editingId,
+      title: titleInput.value,
+      language: languageInput.value,
+      tags: tagsInput.value,
+      code: codeInput.value
+    });
+  } catch (error) {
+    // store.js raises two distinct, already user-readable messages ("Add a
+    // title and some code.", "This snippet no longer exists.") and a storage
+    // quota error raises something that is not. Show the first kind as-is;
+    // replace anything else with a sentence the user can act on. Swallowing
+    // both behind one string is what the concepts chapter warns against.
+    showMessage(isUserFacingError(error)
+      ? `${error.message} Your saved data and form are unchanged.`
+      : "Could not save this snippet. Your saved data and form are unchanged.");
+    return;
+  }
 
   showMessage(view.editingId ? "Snippet updated." : "Snippet saved.");
   resetForm();
@@ -70,7 +82,14 @@ function startEdit(id) {
 }
 
 function removeSnippet(id) {
-  deleteSnippet(id);
+  try {
+    deleteSnippet(id);
+  } catch (error) {
+    showMessage(isUserFacingError(error)
+      ? `${error.message} Nothing was deleted.`
+      : "Could not delete this snippet. Try again.");
+    return;
+  }
   if (view.editingId === id) resetForm();
   showMessage("Snippet deleted.");
   render();

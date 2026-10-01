@@ -18,7 +18,7 @@ const state = {
   polls: loadPolls(),
   editingId: null,
   // draft option text values held while the form is open
-  draftOptions: ["", ""]
+  draftOptions: [newOption(), newOption()]
 };
 
 const form = document.querySelector("#poll-form");
@@ -40,7 +40,7 @@ addOptionButton.addEventListener("click", () => {
     showMessage(`Polls can have up to ${MAX_OPTIONS} options.`);
     return;
   }
-  state.draftOptions.push("");
+  state.draftOptions.push(newOption());
   renderOptionRows();
 });
 
@@ -52,8 +52,13 @@ function loadPolls() {
   return saved ? JSON.parse(saved) : starterPolls;
 }
 
-function savePolls() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(state.polls));
+function newOption() { return { id: crypto.randomUUID(), text: "" }; }
+
+function commitPolls(candidate) {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(candidate)); }
+  catch { showMessage("Could not save. Your current poll and draft are unchanged."); return false; }
+  state.polls = candidate;
+  return true;
 }
 
 function renderOptionRows() {
@@ -64,11 +69,12 @@ function renderOptionRows() {
 
     const input = document.createElement("input");
     input.type = "text";
-    input.value = value;
+    input.value = value.text;
+    input.setAttribute("aria-label", `Option ${index + 1}`);
     input.maxLength = 80;
     input.placeholder = `Option ${index + 1}`;
     input.addEventListener("input", (event) => {
-      state.draftOptions[index] = event.target.value;
+      state.draftOptions[index].text = event.target.value;
     });
 
     const remove = document.createElement("button");
@@ -89,96 +95,53 @@ function renderOptionRows() {
 
 function handleSubmit(event) {
   event.preventDefault();
-
   const question = questionInput.value.trim();
-  const texts = state.draftOptions.map((text) => text.trim()).filter(Boolean);
-
-  if (!question) {
-    showMessage("Add a question.");
-    return;
-  }
-  if (texts.length < MIN_OPTIONS) {
-    showMessage(`Fill in at least ${MIN_OPTIONS} options.`);
-    return;
-  }
-
-  if (state.editingId) {
-    const existing = state.polls.find((poll) => poll.id === state.editingId);
-    const keepVotes = existing && existing.options.length === texts.length;
-    const options = texts.map((text, index) => ({
-      id: keepVotes ? existing.options[index].id : crypto.randomUUID(),
-      text,
-      votes: keepVotes ? existing.options[index].votes : 0
-    }));
-    state.polls = state.polls.map((poll) =>
-      poll.id === state.editingId ? { ...poll, question, options } : poll
-    );
-    showMessage("Poll updated.");
-  } else {
-    state.polls.unshift({
-      id: crypto.randomUUID(),
-      question,
-      options: texts.map((text) => ({ id: crypto.randomUUID(), text, votes: 0 }))
-    });
-    showMessage("Poll created.");
-  }
-
-  savePolls();
-  resetForm();
-  render();
+  const draft = state.draftOptions.map(option => ({ ...option, text: option.text.trim() }));
+  if (!question || question.length > 160) return showMessage("Add a question of at most 160 characters.");
+  if (draft.length < MIN_OPTIONS || draft.length > MAX_OPTIONS || draft.some(x => !x.text || x.text.length > 80))
+    return showMessage("Fill every option, or remove its row. Use 2 to 6 options of at most 80 characters.");
+  if (new Set(draft.map(x => x.text.toLowerCase())).size !== draft.length)
+    return showMessage("Each option must have different text (ignoring letter case).");
+  const existing = state.polls.find(poll => poll.id === state.editingId);
+  if (state.editingId && !existing) return showMessage("This poll no longer exists.");
+  const options = draft.map(option => ({ ...option, votes: existing?.options.find(x => x.id === option.id)?.votes ?? 0 }));
+  const poll = { id: existing?.id ?? crypto.randomUUID(), question, options };
+  const candidate = existing ? state.polls.map(x => x.id === poll.id ? poll : x) : [poll, ...state.polls];
+  if (!commitPolls(candidate)) return;
+  showMessage(existing ? "Poll updated." : "Poll created."); resetForm(); render();
 }
 
 function vote(pollId, optionId) {
-  state.polls = state.polls.map((poll) => {
-    if (poll.id !== pollId) return poll;
-    return {
-      ...poll,
-      options: poll.options.map((option) =>
-        option.id === optionId ? { ...option, votes: option.votes + 1 } : option
-      )
-    };
+  const candidate = state.polls.map(poll => poll.id !== pollId ? poll : {
+    ...poll, options: poll.options.map(option => option.id === optionId ? { ...option, votes: option.votes + 1 } : option)
   });
-  savePolls();
-  render();
+  if (commitPolls(candidate)) render();
 }
 
 function resetVotes(pollId) {
-  state.polls = state.polls.map((poll) =>
-    poll.id === pollId
-      ? { ...poll, options: poll.options.map((option) => ({ ...option, votes: 0 })) }
-      : poll
-  );
-  savePolls();
-  render();
+  const candidate = state.polls.map(poll => poll.id !== pollId ? poll : {
+    ...poll, options: poll.options.map(option => ({ ...option, votes: 0 }))
+  });
+  if (commitPolls(candidate)) render();
 }
 
 function editPoll(id) {
-  const poll = state.polls.find((item) => item.id === id);
-  if (!poll) return;
-
-  state.editingId = id;
-  idInput.value = poll.id;
-  questionInput.value = poll.question;
-  state.draftOptions = poll.options.map((option) => option.text);
-  renderOptionRows();
-  submitButton.textContent = "Update poll";
-  cancelButton.hidden = false;
-  questionInput.focus();
+  const poll = state.polls.find(item => item.id === id); if (!poll) return;
+  state.editingId = id; idInput.value = id; questionInput.value = poll.question;
+  state.draftOptions = poll.options.map(({ id, text }) => ({ id, text }));
+  renderOptionRows(); submitButton.textContent = "Update poll"; cancelButton.hidden = false; questionInput.focus();
 }
 
 function deletePoll(id) {
-  state.polls = state.polls.filter((poll) => poll.id !== id);
-  savePolls();
-  if (state.editingId === id) resetForm();
-  showMessage("Poll deleted.");
-  render();
+  if (!commitPolls(state.polls.filter(poll => poll.id !== id))) return;
+  if (state.editingId === id) resetForm(); showMessage("Poll deleted."); render();
 }
 
 function resetForm() {
   form.reset();
   idInput.value = "";
   state.editingId = null;
-  state.draftOptions = ["", ""];
+  state.draftOptions = [newOption(), newOption()];
   renderOptionRows();
   submitButton.textContent = "Create poll";
   cancelButton.hidden = true;

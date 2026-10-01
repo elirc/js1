@@ -34,3 +34,7 @@ The server seeds ~47 products so paging is actually visible.
 - Add multi-column sort
 - Add a total-inventory-value summary across all pages
 - Move to SQL with `LIMIT`/`OFFSET` and `ORDER BY`
+
+## Junior SWE learning course
+
+[Start the detailed Astra upskilling course](astraupskill/README.md): filter-sort-slice order and numeric boundaries, with a codebase map, worked implementation, executable examples, debugging labs, exercises and solution discussions.

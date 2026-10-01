@@ -41,3 +41,7 @@ npm run dev                     # API on :4110, Vite client on :5110
 - Add a `PUT` form in the UI (the server already supports editing).
 - Add a `paid_at` timestamp set when status moves to `paid`.
 - Add a monthly revenue report with `date_trunc('month', issued_date)`.
+
+## Junior SWE learning course
+
+[Start the detailed Astra upskilling course](astraupskill/README.md): decimal input contracts and transactional parent/child writes, with a codebase map, worked implementation, executable examples, debugging labs, exercises and solution discussions.

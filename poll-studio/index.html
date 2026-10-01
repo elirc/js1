@@ -17,14 +17,14 @@
         <input type="hidden" id="poll-id">
 
         <label for="poll-question">Question</label>
-        <input id="poll-question" name="question" type="text" maxlength="120" placeholder="What should we build next?" required>
+        <input id="poll-question" name="question" type="text" maxlength="160" placeholder="What should we build next?" required>
 
         <div class="options-head">
           <label>Options</label>
           <button type="button" class="secondary" id="add-option">+ Add option</button>
         </div>
         <div id="option-rows" class="option-rows"></div>
-        <p class="hint muted">Polls need at least two options. Editing keeps existing votes when the option count stays the same.</p>
+        <p class="hint muted">Polls need at least two options. Editing preserves votes for existing options, even when other options are removed.</p>
 
         <div class="actions">
           <button type="submit" id="submit-button">Create poll</button>

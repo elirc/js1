@@ -28,3 +28,7 @@ python -m http.server
 
 Then open the served URL. Compare this structure with `task-board`, which
 does the same job in a single file, and notice what the module split buys you.
+
+## Junior SWE learning course
+
+[Start the detailed Astra upskilling course](astraupskill/README.md): ES modules, normalization and rejected promises, with a codebase map, worked implementation, executable examples, debugging labs, exercises and solution discussions.

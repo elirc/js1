@@ -41,3 +41,7 @@ npm run dev          # API on :4114, client on :5114
 - Add replies (`posts`) and include them in the search vector.
 - Add trigram search (`pg_trgm`) for fuzzy/typo-tolerant matching.
 - Switch ranking to `ts_rank_cd` and compare the ordering.
+
+## Junior SWE learning course
+
+[Start the detailed Astra upskilling course](astraupskill/README.md): count/page consistency, stable ordering and bounded input, with a codebase map, worked implementation, executable examples, debugging labs, exercises and solution discussions.

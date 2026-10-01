@@ -1,20 +1,22 @@
+import { pathToFileURL } from "node:url";
 import "dotenv/config";
 import express from "express";
 import cors from "cors";
 import { pool, query, withTransaction } from "./db.js";
 import type { NewThread, Tag, Thread, ThreadPage, ThreadSummary, User } from "../../shared/types.js";
 
-const app = express();
+export const app = express();
 const port = Number(process.env.PORT ?? 4114);
 
 app.use(cors());
 app.use(express.json());
+app.param("id",(_req,res,next,value) => { if (!validId(value)) return res.status(400).json({ error: "Use a valid record id." }); next(); });
 
-app.get("/api/users", async (_req, res) => {
+app.get("/api/users", asyncRoute(async (_req, res) => {
   res.json(await query<User>("SELECT id, username FROM users ORDER BY username"));
-});
+}));
 
-app.get("/api/tags", async (_req, res) => {
+app.get("/api/tags", asyncRoute(async (_req, res) => {
   const rows = await query<{ name: string; count: string }>(
     `SELECT tg.name, COUNT(tt.thread_id) AS count
        FROM tags tg
@@ -24,19 +26,26 @@ app.get("/api/tags", async (_req, res) => {
   );
   const tags: Tag[] = rows.map((row) => ({ name: row.name, count: Number(row.count) }));
   res.json(tags);
-});
+}));
 
 // Full-text search + tag filter + pagination, all in one query.
 // COUNT(*) OVER() gives the total match count before LIMIT/OFFSET, so we
 // avoid a second round-trip just to count.
-app.get("/api/threads", async (req, res) => {
+app.get("/api/threads", asyncRoute(async (req, res) => {
   const q = typeof req.query.q === "string" ? req.query.q.trim() : "";
   const tag = typeof req.query.tag === "string" ? req.query.tag : "";
-  const page = Math.max(1, Number(req.query.page) || 1);
-  const pageSize = Math.min(20, Math.max(1, Number(req.query.pageSize) || 5));
+  let page = pageNumber(req.query.page,1,1000000);
+  const pageSize = pageNumber(req.query.pageSize,5,20);
+  return withTransaction(async client => {
+  await client.query("SET TRANSACTION ISOLATION LEVEL REPEATABLE READ READ ONLY");
+  const count = await client.query<{ total: string }>(`SELECT COUNT(*) AS total FROM threads t
+    WHERE ($1 = '' OR t.search @@ websearch_to_tsquery('english',$1))
+    AND ($2 = '' OR EXISTS (SELECT 1 FROM thread_tags x JOIN tags y ON y.id=x.tag_id WHERE x.thread_id=t.id AND y.name=$2))`,[q,tag]);
+  const total = Number(count.rows[0]!.total);
+  page = Math.min(page,Math.max(1,Math.ceil(total/pageSize)));
   const offset = (page - 1) * pageSize;
 
-  const rows = await query<{
+  const { rows } = await client.query<{
     id: string;
     title: string;
     author: string;
@@ -60,12 +69,12 @@ app.get("/api/threads", async (req, res) => {
               SELECT 1 FROM thread_tags x JOIN tags y ON y.id = x.tag_id
                WHERE x.thread_id = t.id AND y.name = $2))
       GROUP BY t.id, u.username
-      ORDER BY ts_rank(t.search, websearch_to_tsquery('english', $1)) DESC, t.created_at DESC
+      ORDER BY ts_rank(t.search, websearch_to_tsquery('english', $1)) DESC, t.created_at DESC, t.id ASC
       LIMIT $3 OFFSET $4`,
     [q, tag, pageSize, offset]
   );
 
-  const total = rows[0] ? Number(rows[0].total) : 0;
+
   const items: ThreadSummary[] = rows.map((row) => ({
     id: row.id,
     title: row.title,
@@ -83,9 +92,10 @@ app.get("/api/threads", async (req, res) => {
     totalPages: Math.max(1, Math.ceil(total / pageSize))
   };
   res.json(payload);
-});
+  });
+}));
 
-app.get("/api/threads/:id", async (req, res) => {
+app.get("/api/threads/:id", asyncRoute(async (req, res) => {
   const rows = await query<{
     id: string;
     title: string;
@@ -108,9 +118,9 @@ app.get("/api/threads/:id", async (req, res) => {
   if (!rows[0]) return res.status(404).json({ error: "Thread not found." });
   const thread: Thread = { ...rows[0], createdAt: rows[0].created_at };
   res.json(thread);
-});
+}));
 
-app.post("/api/threads", async (req, res, next) => {
+app.post("/api/threads", asyncRoute(async (req, res, next) => {
   try {
     const input = parseThread(req.body);
     const id = await withTransaction(async (client) => {
@@ -136,30 +146,36 @@ app.post("/api/threads", async (req, res, next) => {
   } catch (error) {
     next(error);
   }
-});
+}));
 
-app.delete("/api/threads/:id", async (req, res) => {
+app.delete("/api/threads/:id", asyncRoute(async (req, res) => {
   const { rowCount } = await pool.query("DELETE FROM threads WHERE id = $1", [req.params.id]);
   if (rowCount === 0) return res.status(404).json({ error: "Thread not found." });
   res.status(204).send();
-});
+}));
 
 app.use((error: unknown, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
   if (error instanceof ValidationError) {
     return res.status(400).json({ error: error.message });
   }
+  if (["22P02","23503","23505","23514","22003"].includes((error as { code?: string }).code ?? "")) return res.status(400).json({ error: "Invalid reference or value." });
   console.error(error);
   res.status(500).json({ error: "Something went wrong." });
 });
 
-app.listen(port, () => {
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) app.listen(port, () => {
   console.log(`Forum Search API on http://localhost:${port}`);
 });
 
 class ValidationError extends Error {}
 
 function parseThread(body: unknown): NewThread {
+  if (!body || typeof body !== "object" || Array.isArray(body)) throw new ValidationError("Send a thread object.");
   const data = body as Partial<NewThread>;
+  if (typeof data.title !== "string" || data.title.length > 200 || data.body !== undefined && (typeof data.body !== "string" || data.body.length > 20000) || !validId(data.authorId))
+    throw new ValidationError("Use bounded title/body text and a valid author id.");
+  if (data.tagNames !== undefined && (!Array.isArray(data.tagNames) || data.tagNames.length > 20 || !data.tagNames.every(tag => typeof tag === "string" && tag.trim().length > 0 && tag.length <= 40)))
+    throw new ValidationError("Use at most 20 nonempty tag strings, each at most 40 characters.");
   const title = (data.title ?? "").trim();
   if (title.length < 3) throw new ValidationError("Title must be at least 3 characters.");
   if (!data.authorId) throw new ValidationError("Choose an author.");
@@ -168,3 +184,11 @@ function parseThread(body: unknown): NewThread {
     : [];
   return { title, body: (data.body ?? "").trim(), authorId: data.authorId, tagNames };
 }
+
+function asyncRoute(handler: (req: express.Request, res: express.Response, next: express.NextFunction) => Promise<unknown>): express.RequestHandler {
+  return (req,res,next) => { Promise.resolve(handler(req,res,next)).catch(next); };
+}
+
+function pageNumber(value: unknown, fallback: number, maximum: number) { const n=Number(value ?? fallback); return Number.isSafeInteger(n) && n>0 ? Math.min(n,maximum) : fallback; }
+
+function validId(value: unknown): value is string { return typeof value === "string" && /^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/i.test(value); }

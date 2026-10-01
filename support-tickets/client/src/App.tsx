@@ -111,22 +111,22 @@ export default function App() {
       <section className="grid">
         <form className="panel" onSubmit={handleSubmit}>
           <h2>New ticket</h2>
-          <label>Subject</label>
-          <input value={form.subject} onChange={(e) => setForm({ ...form, subject: e.target.value })} />
+          <label htmlFor="field-subject">Subject</label>
+          <input id="field-subject" value={form.subject} onChange={(e) => setForm({ ...form, subject: e.target.value })} />
 
-          <label>Details</label>
-          <textarea rows={4} value={form.body} onChange={(e) => setForm({ ...form, body: e.target.value })} />
+          <label htmlFor="field-body">Details</label>
+          <textarea id="field-body" rows={4} value={form.body} onChange={(e) => setForm({ ...form, body: e.target.value })} />
 
           <div className="field-row">
             <div>
-              <label>Priority</label>
-              <select value={form.priority} onChange={(e) => setForm({ ...form, priority: e.target.value as TicketPriority })}>
+              <label htmlFor="field-priority">Priority</label>
+              <select id="field-priority" value={form.priority} onChange={(e) => setForm({ ...form, priority: e.target.value as TicketPriority })}>
                 {PRIORITIES.map((p) => <option key={p} value={p}>{p}</option>)}
               </select>
             </div>
             <div>
-              <label>Assignee</label>
-              <select value={form.assigneeId ?? ""} onChange={(e) => setForm({ ...form, assigneeId: e.target.value || null })}>
+              <label htmlFor="lesson-field-4">Assignee</label>
+              <select id="lesson-field-4" value={form.assigneeId ?? ""} onChange={(e) => setForm({ ...form, assigneeId: e.target.value || null })}>
                 <option value="">Unassigned</option>
                 {agents.map((a) => <option key={a.id} value={a.id}>{a.name}</option>)}
               </select>
@@ -148,7 +148,7 @@ export default function App() {
           </div>
 
           <button type="submit">Create ticket</button>
-          <p className="message">{message}</p>
+          <p role="status" className="message">{message}</p>
         </form>
 
         <section className="panel">

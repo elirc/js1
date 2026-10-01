@@ -1,11 +1,17 @@
+import { pathToFileURL } from "node:url";
 import express from "express";
 import cors from "cors";
 
-const app = express();
+export const app = express();
 const port = 4109;
 
 app.use(cors());
 app.use(express.json());
+app.use((req,res,next) => {
+  if (["POST","PUT","PATCH"].includes(req.method) && (!req.body || typeof req.body !== "object" || Array.isArray(req.body)))
+    return res.status(400).json({ error: "Send a JSON object." });
+  next();
+});
 
 const repository = createProductRepository();
 
@@ -18,8 +24,8 @@ app.get("/api/products", (req, res) => {
   const category = String(req.query.category || "all");
   const sort = SORTABLE.includes(req.query.sort) ? req.query.sort : "name";
   const dir = req.query.dir === "desc" ? "desc" : "asc";
-  const page = Math.max(1, Number(req.query.page) || 1);
-  const pageSize = clamp(Number(req.query.pageSize) || 5, 1, 50);
+  const page = whole(req.query.page,1,1000000) ? Number(req.query.page) : 1;
+  const pageSize = whole(req.query.pageSize,1,1000000) ? Math.min(Number(req.query.pageSize),50) : 5;
 
   const result = repository.query({ search, category, sort, dir, page, pageSize });
   res.json(result);
@@ -49,24 +55,15 @@ app.delete("/api/products/:id", (req, res) => {
   res.status(204).send();
 });
 
-app.listen(port, () => {
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) app.listen(port, () => {
   console.log(`Stock Catalog API listening on http://localhost:${port}`);
 });
 
 function validateProduct(req, res, next) {
   const { name, category, price, stock } = req.body;
-  if (!name || name.trim().length < 2) {
-    return res.status(400).json({ error: "Name must be at least 2 characters." });
-  }
-  if (!category || category.trim().length < 2) {
-    return res.status(400).json({ error: "Category must be at least 2 characters." });
-  }
-  if (!(Number(price) >= 0)) {
-    return res.status(400).json({ error: "Price must be zero or more." });
-  }
-  if (!Number.isInteger(Number(stock)) || Number(stock) < 0) {
-    return res.status(400).json({ error: "Stock must be a non-negative whole number." });
-  }
+  if (!isText(name,2) || !isText(category,2) || !whole(stock,0,1000000000) ||
+      !(typeof price === "number" || typeof price === "string" && price.trim() !== "") || !Number.isFinite(Number(price)) || Number(price) < 0 || Number(price) > 9999999999.99)
+    return res.status(400).json({ error: "Use bounded names, a finite price and a whole stock count." });
   next();
 }
 
@@ -99,7 +96,7 @@ function createProductRepository() {
         return matchesCategory && matchesSearch;
       });
 
-      const sorted = [...filtered].sort((a, b) => compare(a, b, sort, dir));
+      const sorted = [...filtered].sort((a, b) => compare(a, b, sort, dir) || a.id.localeCompare(b.id));
 
       const total = sorted.length;
       const totalPages = Math.max(1, Math.ceil(total / pageSize));
@@ -158,3 +155,6 @@ function seedProducts() {
   }
   return products;
 }
+
+function isText(value, min = 0, max = 200) { return typeof value === "string" && value.trim().length >= min && value.length <= max; }
+function whole(value, min, max) { return (typeof value === "number" || typeof value === "string" && value.trim() !== "") && Number.isSafeInteger(Number(value)) && Number(value) >= min && Number(value) <= max; }

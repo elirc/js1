@@ -21,3 +21,7 @@ flow** — the same data shown two different ways.
    the hardest ones first.
 
 Open `index.html` in a browser to run it.
+
+## Junior SWE learning course
+
+[Start the detailed Astra upskilling course](astraupskill/README.md): session snapshots, state transitions and persistence failure, with a codebase map, worked implementation, executable examples, debugging labs, exercises and solution discussions.

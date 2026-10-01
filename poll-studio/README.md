@@ -19,3 +19,7 @@ forms where the number of inputs changes at runtime.
 3. Add a "share of leader" highlight on the winning option.
 
 Open `index.html` in a browser to run it.
+
+## Junior SWE learning course
+
+[Start the detailed Astra upskilling course](astraupskill/README.md): identity in dynamic arrays and commit-before-publish, with a codebase map, worked implementation, executable examples, debugging labs, exercises and solution discussions.

@@ -1,7 +1,8 @@
+import { pathToFileURL } from "node:url";
 import express from "express";
 import cors from "cors";
 
-const app = express();
+export const app = express();
 const port = 4105;
 let events = [
   {
@@ -17,6 +18,11 @@ let events = [
 
 app.use(cors());
 app.use(express.json());
+app.use((req,res,next) => {
+  if (["POST","PUT","PATCH"].includes(req.method) && (!req.body || typeof req.body !== "object" || Array.isArray(req.body)))
+    return res.status(400).json({ error: "Send a JSON object." });
+  next();
+});
 
 app.get("/api/events", (req, res) => {
   const search = String(req.query.search || "").toLowerCase();
@@ -53,17 +59,17 @@ app.delete("/api/events/:id", (req, res) => {
   res.status(204).send();
 });
 
-app.listen(port, () => {
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) app.listen(port, () => {
   console.log(`Event Admin API listening on http://localhost:${port}`);
 });
 
 function validateEvent(req, res, next) {
+  if (!["name","location"].every(key => isText(req.body[key],1)) || !realDate(req.body.date) || !whole(req.body.capacity,1,100000) || !whole(req.body.registered,0,100000))
+    return res.status(400).json({ error: "Use text, a real calendar date and whole capacity/registration counts." });
   const event = normalizeEvent(req.body);
-  if (!event.name || !event.location || !event.date) {
-    return res.status(400).json({ error: "Name, location, and date are required." });
-  }
-  if (event.capacity < 1 || event.registered < 0 || event.registered > event.capacity) {
-    return res.status(400).json({ error: "Capacity and registered counts are invalid." });
+  // The type gate above already bounds both counts; only the cross-field rule remains here.
+  if (event.registered > event.capacity) {
+    return res.status(400).json({ error: "Registered count cannot exceed capacity." });
   }
   if (!["Open", "Waitlist", "Closed"].includes(event.status)) {
     return res.status(400).json({ error: "Choose a valid event status." });
@@ -81,3 +87,7 @@ function normalizeEvent(input) {
     status: input.status || "Open"
   };
 }
+
+function isText(value, min = 0, max = 200) { return typeof value === "string" && value.trim().length >= min && value.length <= max; }
+function whole(value, min, max) { return (typeof value === "number" || typeof value === "string" && value.trim() !== "") && Number.isSafeInteger(Number(value)) && Number(value) >= min && Number(value) <= max; }
+function realDate(value) { return typeof value === "string" && /^\d{4}-\d{2}-\d{2}$/.test(value) && !Number.isNaN(Date.parse(value+"T00:00:00Z")) && new Date(value+"T00:00:00Z").toISOString().slice(0,10) === value; }

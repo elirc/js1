@@ -318,3 +318,9 @@ button:disabled {
     grid-template-columns: 1fr;
   }
 }
+
+/* Keep the study option together while allowing narrow toolbars to wrap. */
+.toolbar { flex-wrap: wrap; }
+.toolbar > select { flex: 1 1 240px; width: auto; }
+.toolbar .study-filter { display: inline-flex; align-items: center; gap: 8px; }
+.study-filter input[type="checkbox"] { width: auto; margin: 0; }

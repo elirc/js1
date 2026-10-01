@@ -1,6 +1,10 @@
 body {
   margin: 0;
-  font-family: Inter, Segoe UI, Arial, sans-serif;
+  font-family:
+    Inter,
+    Segoe UI,
+    Arial,
+    sans-serif;
   background: #f4f7fb;
   color: #182033;
 }
@@ -161,4 +165,32 @@ button.danger {
     flex-direction: column;
     align-items: stretch;
   }
+}
+
+/* Keep forms and ledger tables usable on narrow learning screens. */
+.panel,
+.grid > *,
+.field-row > * {
+  min-width: 0;
+}
+input,
+select,
+textarea {
+  max-width: 100%;
+  box-sizing: border-box;
+}
+@media (max-width: 600px) {
+  .field-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .panel {
+    overflow-x: auto;
+  }
+  .account {
+    flex-wrap: wrap;
+  }
+}
+
+.auth-card {
+  box-sizing: border-box;
 }

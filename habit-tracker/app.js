@@ -139,7 +139,10 @@ function render() {
     streak.className = "streak-badge";
     const streakValue = currentStreak(habit);
     streak.textContent = streakValue === 1 ? "1 day streak" : `${streakValue} day streak`;
-    header.append(title, streak);
+    const best = document.createElement("span");
+    best.className = "streak-badge best-streak";
+    best.textContent = `Best: ${bestStreak(habit)} days`;
+    header.append(title, streak, best);
 
     const grid = document.createElement("div");
     grid.className = "day-grid";
@@ -150,6 +153,7 @@ function render() {
       cell.type = "button";
       cell.className = `day-cell ${done ? "done" : ""}`;
       cell.setAttribute("aria-pressed", String(done));
+      cell.setAttribute("aria-label", `${habit.name}: ${iso}`);
       cell.innerHTML = `<span class="dow">${weekday(day)}</span><span class="dom">${day.getDate()}</span>`;
       cell.addEventListener("click", () => toggleDay(habit.id, iso));
       grid.append(cell);
@@ -193,11 +197,28 @@ function renderSummary(week) {
 function currentStreak(habit) {
   let streak = 0;
   const cursor = startOfToday();
+  // Today is still in progress; yesterday may anchor an active streak.
+  if (!habit.history[isoDate(cursor)]) cursor.setDate(cursor.getDate() - 1);
   while (habit.history[isoDate(cursor)]) {
     streak += 1;
     cursor.setDate(cursor.getDate() - 1);
   }
   return streak;
+}
+
+function bestStreak(habit, today = isoDate(startOfToday())) {
+  const days = Object.entries(habit.history).filter(([date, checked]) => {
+    if (checked !== true || !/^\d{4}-\d{2}-\d{2}$/.test(date) || date > today) return false;
+    const parsed = new Date(`${date}T00:00:00Z`);
+    return Number.isFinite(parsed.getTime()) && parsed.toISOString().slice(0, 10) === date;
+  }).map(([date]) => Date.parse(`${date}T00:00:00Z`) / 86400000).sort((a, b) => a - b);
+  let best = 0, run = 0, previous;
+  for (const day of days) {
+    run = previous !== undefined && day === previous + 1 ? run + 1 : 1;
+    best = Math.max(best, run);
+    previous = day;
+  }
+  return best;
 }
 
 function button(label, variant, onClick) {

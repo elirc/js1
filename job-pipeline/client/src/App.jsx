@@ -81,31 +81,31 @@ export default function App() {
 
       <section className="grid">
         <form className="panel" onSubmit={saveApplication}>
-          <label>Company</label>
-          <input value={form.company} onChange={(event) => setForm({ ...form, company: event.target.value })} />
+          <label htmlFor="field-company">Company</label>
+          <input id="field-company" value={form.company} onChange={(event) => setForm({ ...form, company: event.target.value })} />
 
-          <label>Role</label>
-          <input value={form.role} onChange={(event) => setForm({ ...form, role: event.target.value })} />
+          <label htmlFor="field-role">Role</label>
+          <input id="field-role" value={form.role} onChange={(event) => setForm({ ...form, role: event.target.value })} />
 
-          <label>Stage</label>
-          <select value={form.stage} onChange={(event) => setForm({ ...form, stage: event.target.value })}>
+          <label htmlFor="field-stage">Stage</label>
+          <select id="field-stage" value={form.stage} onChange={(event) => setForm({ ...form, stage: event.target.value })}>
             {stages.map((stage) => <option key={stage}>{stage}</option>)}
           </select>
 
-          <label>Contact</label>
-          <input value={form.contact} onChange={(event) => setForm({ ...form, contact: event.target.value })} />
+          <label htmlFor="field-contact">Contact</label>
+          <input id="field-contact" value={form.contact} onChange={(event) => setForm({ ...form, contact: event.target.value })} />
 
-          <label>Next step date</label>
-          <input type="date" value={form.nextStepDate} onChange={(event) => setForm({ ...form, nextStepDate: event.target.value })} />
+          <label htmlFor="field-next-step-date">Next step date</label>
+          <input id="field-next-step-date" type="date" value={form.nextStepDate} onChange={(event) => setForm({ ...form, nextStepDate: event.target.value })} />
 
-          <label>Notes</label>
-          <textarea rows="4" value={form.notes} onChange={(event) => setForm({ ...form, notes: event.target.value })} />
+          <label htmlFor="field-notes">Notes</label>
+          <textarea id="field-notes" rows="4" value={form.notes} onChange={(event) => setForm({ ...form, notes: event.target.value })} />
 
           <div className="actions">
             <button>{editingId ? "Update application" : "Create application"}</button>
             {editingId && <button type="button" className="secondary" onClick={resetForm}>Cancel</button>}
           </div>
-          <p className="message">{message}</p>
+          <p role="status" className="message">{message}</p>
         </form>
 
         <section className="panel">

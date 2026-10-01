@@ -2,6 +2,8 @@ import "dotenv/config";
 import pg from "pg";
 
 const { Pool } = pg;
+// A calendar date is a label, not a local-midnight timestamp.
+pg.types.setTypeParser(1082, value => value);
 
 export const pool = new Pool({
   connectionString: process.env.DATABASE_URL ?? "postgres://postgres:postgres@localhost:5432/quality_audits"

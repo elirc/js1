@@ -31,8 +31,8 @@ CREATE INDEX items_category_idx ON items(category);
 CREATE INDEX activity_entries_item_idx ON activity_entries(item_id, created_at DESC);
 
 INSERT INTO items (title, owner, category, status, amount, priority, due_date, notes)
-SELECT title, owner, category, status, amount, priority, due_date::date, notes
-FROM json_to_recordset('[{"owner":"Quinn Li","dueDate":"2026-07-28","title":"Checkout usability test","category":"Usability","amount":12,"status":"Recruiting","priority":"High","notes":"Need mobile participants."},{"owner":"Eli Park","dueDate":"2026-08-15","title":"Pricing research wave 2","category":"Market","amount":30,"status":"Design","priority":"Medium","notes":"Draft screener questions."}]'::json) AS x(title text, owner text, category text, status text, amount numeric, priority text, due_date text, notes text);
+SELECT title, owner, category, status, amount, priority, "dueDate"::date, notes
+FROM json_to_recordset('[{"owner":"Quinn Li","dueDate":"2026-07-28","title":"Checkout usability test","category":"Usability","amount":12,"status":"Recruiting","priority":"High","notes":"Need mobile participants."},{"owner":"Eli Park","dueDate":"2026-08-15","title":"Pricing research wave 2","category":"Market","amount":30,"status":"Design","priority":"Medium","notes":"Draft screener questions."}]'::json) AS x(title text, owner text, category text, status text, amount numeric, priority text, "dueDate" text, notes text);
 
 INSERT INTO activity_entries (item_id, kind, body)
 SELECT id, 'created', 'Seeded ' || title FROM items;

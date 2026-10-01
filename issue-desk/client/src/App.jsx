@@ -14,7 +14,7 @@ export default function App() {
   const [issues, setIssues] = useState([]);
   const [form, setForm] = useState(emptyForm);
   const [editingId, setEditingId] = useState(null);
-  const [filters, setFilters] = useState({ status: "all", search: "" });
+  const [filters, setFilters] = useState({ status: "all", search: "", priority: "all" });
   const [message, setMessage] = useState("");
 
   useEffect(() => {
@@ -91,16 +91,16 @@ export default function App() {
 
       <section className="grid">
         <form className="panel" onSubmit={handleSubmit}>
-          <label>Title</label>
-          <input value={form.title} onChange={(event) => setForm({ ...form, title: event.target.value })} />
+          <label htmlFor="field-title">Title</label>
+          <input id="field-title" value={form.title} onChange={(event) => setForm({ ...form, title: event.target.value })} />
 
-          <label>Assignee</label>
-          <input value={form.assignee} onChange={(event) => setForm({ ...form, assignee: event.target.value })} />
+          <label htmlFor="field-assignee">Assignee</label>
+          <input id="field-assignee" value={form.assignee} onChange={(event) => setForm({ ...form, assignee: event.target.value })} />
 
           <div className="field-row">
             <div>
-              <label>Status</label>
-              <select value={form.status} onChange={(event) => setForm({ ...form, status: event.target.value })}>
+              <label htmlFor="field-status">Status</label>
+              <select id="field-status" value={form.status} onChange={(event) => setForm({ ...form, status: event.target.value })}>
                 <option>Backlog</option>
                 <option>In Progress</option>
                 <option>Review</option>
@@ -108,8 +108,8 @@ export default function App() {
               </select>
             </div>
             <div>
-              <label>Priority</label>
-              <select value={form.priority} onChange={(event) => setForm({ ...form, priority: event.target.value })}>
+              <label htmlFor="field-priority">Priority</label>
+              <select id="field-priority" value={form.priority} onChange={(event) => setForm({ ...form, priority: event.target.value })}>
                 <option>Low</option>
                 <option>Medium</option>
                 <option>High</option>
@@ -118,19 +118,23 @@ export default function App() {
             </div>
           </div>
 
-          <label>Description</label>
-          <textarea rows="5" value={form.description} onChange={(event) => setForm({ ...form, description: event.target.value })} />
+          <label htmlFor="field-description">Description</label>
+          <textarea id="field-description" rows="5" value={form.description} onChange={(event) => setForm({ ...form, description: event.target.value })} />
 
           <div className="actions">
             <button type="submit">{editingId ? "Update issue" : "Create issue"}</button>
             {editingId && <button type="button" className="secondary" onClick={resetForm}>Cancel</button>}
           </div>
-          <p className="message">{message}</p>
+          <p role="status" className="message">{message}</p>
         </form>
 
         <section className="panel">
           <div className="toolbar">
-            <input placeholder="Search issues" value={filters.search} onChange={(event) => setFilters({ ...filters, search: event.target.value })} />
+            <select aria-label="Filter priority" value={filters.priority} onChange={event => setFilters({ ...filters, priority: event.target.value })}>
+              <option value="all">All priorities</option>
+              {["Low","Medium","High","Critical"].map(priority => <option key={priority}>{priority}</option>)}
+            </select>
+            <input aria-label="Search issues" placeholder="Search issues" value={filters.search} onChange={(event) => setFilters({ ...filters, search: event.target.value })} />
             <select value={filters.status} onChange={(event) => setFilters({ ...filters, status: event.target.value })}>
               <option value="all">All statuses</option>
               <option>Backlog</option>

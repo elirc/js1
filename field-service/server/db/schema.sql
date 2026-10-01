@@ -31,8 +31,8 @@ CREATE INDEX items_category_idx ON items(category);
 CREATE INDEX activity_entries_item_idx ON activity_entries(item_id, created_at DESC);
 
 INSERT INTO items (title, owner, category, status, amount, priority, due_date, notes)
-SELECT title, owner, category, status, amount, priority, due_date::date, notes
-FROM json_to_recordset('[{"owner":"Jordan Kim","dueDate":"2026-07-09","title":"Warehouse East","category":"Inspection","amount":750,"status":"Scheduled","priority":"High","notes":"Bring calibration kit."},{"owner":"Lee Wong","dueDate":"2026-07-05","title":"Retail Site 44","category":"Repair","amount":1200,"status":"Requested","priority":"Critical","notes":"Payment terminal offline."}]'::json) AS x(title text, owner text, category text, status text, amount numeric, priority text, due_date text, notes text);
+SELECT title, owner, category, status, amount, priority, "dueDate"::date, notes
+FROM json_to_recordset('[{"owner":"Jordan Kim","dueDate":"2026-07-09","title":"Warehouse East","category":"Inspection","amount":750,"status":"Scheduled","priority":"High","notes":"Bring calibration kit."},{"owner":"Lee Wong","dueDate":"2026-07-05","title":"Retail Site 44","category":"Repair","amount":1200,"status":"Requested","priority":"Critical","notes":"Payment terminal offline."}]'::json) AS x(title text, owner text, category text, status text, amount numeric, priority text, "dueDate" text, notes text);
 
 INSERT INTO activity_entries (item_id, kind, body)
 SELECT id, 'created', 'Seeded ' || title FROM items;

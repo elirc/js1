@@ -16,3 +16,7 @@ A React + Node CRUD project for tracking job applications.
 - Add optimistic updates in React
 - Add authentication and per-user records
 - Add server-side sorting
+
+## Junior SWE learning course
+
+[Start the detailed Astra upskilling course](astraupskill/README.md): optional values and stable chronological sorting, with a codebase map, worked implementation, executable examples, debugging labs, exercises and solution discussions.

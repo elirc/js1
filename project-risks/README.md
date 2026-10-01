@@ -19,3 +19,7 @@ A more complex JavaScript CRUD learning app using a React client and Express ser
 - client/src/styles.css - practical dashboard styling
 
 This is intentionally a study scaffold. No dependencies are installed in this folder.
+
+## Junior SWE learning course
+
+[Start the detailed Astra upskilling course](astraupskill/README.md): repeat-safe workflow history and explicit input contracts, with a codebase map, worked implementation, executable examples, debugging labs, exercises and solution discussions.

@@ -45,3 +45,7 @@ keyed on `(product_id, warehouse_id)` before reading. Good stretch exercise.
 - Add a stock-valuation report (`SUM(delta) * unit_cost`).
 - Add a movements-by-day chart with `date_trunc('day', created_at)`.
 - Add the advisory-lock fix described above.
+
+## Junior SWE learning course
+
+[Start the detailed Astra upskilling course](astraupskill/README.md): protecting a balance under concurrent writes, with a codebase map, worked implementation, executable examples, debugging labs, exercises and solution discussions.

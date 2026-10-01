@@ -1,4 +1,4 @@
-﻿{
+{
   "name": "patient-intake",
   "version": "1.0.0",
   "private": true,
@@ -6,7 +6,9 @@
   "scripts": {
     "dev:server": "node server/server.js",
     "dev:client": "vite --host 127.0.0.1",
-    "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\""
+    "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
+    "test": "node --test test/*.test.js",
+    "build": "vite build"
   },
   "dependencies": {
     "@vitejs/plugin-react": "latest",

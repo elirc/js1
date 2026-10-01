@@ -186,6 +186,23 @@ button:hover {
   text-decoration: underline;
 }
 
+.move-column {
+  width: 100%;
+  margin: 6px 0 0;
+  padding: 4px 6px;
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: var(--brand);
+  background: none;
+  border: 1px solid var(--brand);
+  border-radius: 6px;
+}
+
+.move-column:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+
 .link-button.danger {
   color: var(--danger);
 }

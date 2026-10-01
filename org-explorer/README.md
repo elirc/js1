@@ -50,3 +50,7 @@ npm run dev          # API on :4116, client on :5116
 - Add a materialized `path` (ltree) for O(1) subtree queries and compare.
 - Add "headcount rolled up" per manager using the recursive subtree.
 - Add depth limits or org-level validation rules.
+
+## Junior SWE learning course
+
+[Start the detailed Astra upskilling course](astraupskill/README.md): recursive queries, structural invariants and concurrent tree moves, with a codebase map, worked implementation, executable examples, debugging labs, exercises and solution discussions.

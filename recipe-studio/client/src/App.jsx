@@ -85,13 +85,13 @@ export default function App() {
 
       <section className="grid">
         <form className="panel" onSubmit={saveRecipe}>
-          <label>Name</label>
-          <input value={form.name} onChange={(event) => setForm({ ...form, name: event.target.value })} />
+          <label htmlFor="field-name">Name</label>
+          <input id="field-name" value={form.name} onChange={(event) => setForm({ ...form, name: event.target.value })} />
 
           <div className="field-row">
             <div>
-              <label>Category</label>
-              <select value={form.category} onChange={(event) => setForm({ ...form, category: event.target.value })}>
+              <label htmlFor="field-category">Category</label>
+              <select id="field-category" value={form.category} onChange={(event) => setForm({ ...form, category: event.target.value })}>
                 <option>Breakfast</option>
                 <option>Lunch</option>
                 <option>Dinner</option>
@@ -99,25 +99,25 @@ export default function App() {
               </select>
             </div>
             <div>
-              <label>Cook time</label>
-              <input type="number" value={form.cookTime} onChange={(event) => setForm({ ...form, cookTime: event.target.value })} />
+              <label htmlFor="field-cook-time">Cook time</label>
+              <input id="field-cook-time" type="number" value={form.cookTime} onChange={(event) => setForm({ ...form, cookTime: event.target.value })} />
             </div>
           </div>
 
-          <label>Servings</label>
-          <input type="number" value={form.servings} onChange={(event) => setForm({ ...form, servings: event.target.value })} />
+          <label htmlFor="field-servings">Servings</label>
+          <input id="field-servings" type="number" value={form.servings} onChange={(event) => setForm({ ...form, servings: event.target.value })} />
 
-          <label>Ingredients</label>
-          <textarea rows="3" value={form.ingredientsText} onChange={(event) => setForm({ ...form, ingredientsText: event.target.value })} placeholder="rice, beans, lime" />
+          <label htmlFor="field-ingredients-text">Ingredients</label>
+          <textarea id="field-ingredients-text" rows="3" value={form.ingredientsText} onChange={(event) => setForm({ ...form, ingredientsText: event.target.value })} placeholder="rice, beans, lime" />
 
-          <label>Notes</label>
-          <textarea rows="4" value={form.notes} onChange={(event) => setForm({ ...form, notes: event.target.value })} />
+          <label htmlFor="field-notes">Notes</label>
+          <textarea id="field-notes" rows="4" value={form.notes} onChange={(event) => setForm({ ...form, notes: event.target.value })} />
 
           <div className="actions">
             <button>{editingId ? "Update recipe" : "Create recipe"}</button>
             {editingId && <button type="button" className="secondary" onClick={resetForm}>Cancel</button>}
           </div>
-          <p className="message">{message}</p>
+          <p role="status" className="message">{message}</p>
         </form>
 
         <section className="panel">

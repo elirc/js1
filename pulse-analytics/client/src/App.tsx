@@ -156,7 +156,7 @@ export default function App() {
         </section>
       </section>
 
-      <p className="message">{message}</p>
+      <p role="status" className="message">{message}</p>
     </main>
   );
 }

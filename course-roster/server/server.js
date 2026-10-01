@@ -1,7 +1,8 @@
+import { pathToFileURL } from "node:url";
 import express from "express";
 import cors from "cors";
 
-const app = express();
+export const app = express();
 const port = 4102;
 let courses = [
   {
@@ -26,6 +27,11 @@ let courses = [
 
 app.use(cors());
 app.use(express.json());
+app.use((req,res,next) => {
+  if (["POST","PUT","PATCH"].includes(req.method) && (!req.body || typeof req.body !== "object" || Array.isArray(req.body)))
+    return res.status(400).json({ error: "Send a JSON object." });
+  next();
+});
 
 app.get("/api/courses", (req, res) => {
   const search = String(req.query.search || "").toLowerCase();
@@ -64,20 +70,17 @@ app.delete("/api/courses/:id", (req, res) => {
   res.status(204).send();
 });
 
-app.listen(port, () => {
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) app.listen(port, () => {
   console.log(`Course Roster API listening on http://localhost:${port}`);
 });
 
 function validateCourse(req, res, next) {
+  if (!["code","title","instructor"].every(key => isText(req.body[key],1)) || !whole(req.body.capacity,1,100000) || !whole(req.body.enrolled,0,100000))
+    return res.status(400).json({ error: "Use text fields and whole capacity/enrollment counts." });
   const course = normalizeCourse(req.body);
-
-  if (!course.code || !course.title || !course.instructor) {
-    return res.status(400).json({ error: "Code, title, and instructor are required." });
-  }
-
-  if (course.capacity < 1 || course.enrolled < 0) {
-    return res.status(400).json({ error: "Capacity and enrolled counts must be valid numbers." });
-  }
+  if (!["Beginner","Intermediate","Advanced"].includes(course.level)) return res.status(400).json({ error: "Choose a valid level." });
+  if (courses.some(existing => existing.id !== req.params.id && existing.code === course.code))
+    return res.status(409).json({ error: "A course with this code already exists." });
 
   if (course.enrolled > course.capacity) {
     return res.status(400).json({ error: "Enrollment cannot exceed capacity." });
@@ -96,3 +99,6 @@ function normalizeCourse(input) {
     level: input.level || "Beginner"
   };
 }
+
+function isText(value, min = 0, max = 200) { return typeof value === "string" && value.trim().length >= min && value.length <= max; }
+function whole(value, min, max) { return (typeof value === "number" || typeof value === "string" && value.trim() !== "") && Number.isSafeInteger(Number(value)) && Number(value) >= min && Number(value) <= max; }

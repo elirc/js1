@@ -8,27 +8,29 @@
     "dev:server": "tsx watch server/src/index.ts",
     "dev:client": "vite",
     "dev": "concurrently -n server,client \"npm:dev:server\" \"npm:dev:client\"",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "tsx --test test/*.test.ts",
+    "build": "vite build"
   },
   "dependencies": {
-    "cors": "latest",
-    "dotenv": "latest",
-    "express": "latest",
-    "pg": "latest",
-    "react": "latest",
-    "react-dom": "latest"
+    "cors": "2.8.6",
+    "dotenv": "17.4.2",
+    "express": "5.2.1",
+    "pg": "8.23.0",
+    "react": "19.3.0",
+    "react-dom": "19.3.0"
   },
   "devDependencies": {
-    "@types/cors": "latest",
-    "@types/express": "latest",
-    "@types/node": "latest",
-    "@types/pg": "latest",
-    "@types/react": "latest",
-    "@types/react-dom": "latest",
-    "@vitejs/plugin-react": "latest",
-    "concurrently": "latest",
-    "tsx": "latest",
-    "typescript": "latest",
-    "vite": "latest"
+    "@types/cors": "2.8.19",
+    "@types/express": "5.0.6",
+    "@types/node": "22.20.3",
+    "@types/pg": "8.23.1",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "@vitejs/plugin-react": "6.1.1",
+    "concurrently": "10.0.5",
+    "tsx": "4.23.13",
+    "typescript": "5.9.3",
+    "vite": "8.3.0"
   }
 }

@@ -40,3 +40,7 @@ npm run dev          # API on :4111, client on :5111
 - Add `GET /api/labels` counts (`COUNT(*)` per label via the join table).
 - Add SLA timers using the `created_at` / `updated_at` columns.
 - Record *who* made each change by adding an `actor_id` to `ticket_events`.
+
+## Junior SWE learning course
+
+[Start the detailed Astra upskilling course](astraupskill/README.md): row locks, atomic updates and meaningful audit events, with a codebase map, worked implementation, executable examples, debugging labs, exercises and solution discussions.

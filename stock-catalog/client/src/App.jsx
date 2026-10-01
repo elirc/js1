@@ -118,20 +118,20 @@ export default function App() {
       <section className="grid">
         <form className="panel" onSubmit={handleSubmit}>
           <h2>{editingId ? "Edit product" : "New product"}</h2>
-          <label>Name</label>
-          <input value={form.name} onChange={(event) => setForm({ ...form, name: event.target.value })} />
+          <label htmlFor="field-name">Name</label>
+          <input id="field-name" value={form.name} onChange={(event) => setForm({ ...form, name: event.target.value })} />
 
-          <label>Category</label>
-          <input value={form.category} onChange={(event) => setForm({ ...form, category: event.target.value })} />
+          <label htmlFor="field-category">Category</label>
+          <input id="field-category" value={form.category} onChange={(event) => setForm({ ...form, category: event.target.value })} />
 
           <div className="field-row">
             <div>
-              <label>Price</label>
-              <input type="number" min="0" step="0.01" value={form.price} onChange={(event) => setForm({ ...form, price: event.target.value })} />
+              <label htmlFor="field-price">Price</label>
+              <input id="field-price" type="number" min="0" step="0.01" value={form.price} onChange={(event) => setForm({ ...form, price: event.target.value })} />
             </div>
             <div>
-              <label>Stock</label>
-              <input type="number" min="0" step="1" value={form.stock} onChange={(event) => setForm({ ...form, stock: event.target.value })} />
+              <label htmlFor="field-stock">Stock</label>
+              <input id="field-stock" type="number" min="0" step="1" value={form.stock} onChange={(event) => setForm({ ...form, stock: event.target.value })} />
             </div>
           </div>
 
@@ -139,7 +139,7 @@ export default function App() {
             <button type="submit">{editingId ? "Save" : "Add product"}</button>
             {editingId && <button type="button" className="secondary" onClick={reset}>Cancel</button>}
           </div>
-          <p className="message">{message}</p>
+          <p role="status" className="message">{message}</p>
         </form>
 
         <section className="panel">

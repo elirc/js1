@@ -201,3 +201,13 @@ button.danger {
     flex-direction: column;
   }
 }
+
+/* Search, sorting and status stay usable as the available width changes. */
+.toolbar { flex-wrap: wrap; }
+.toolbar input { flex: 1 1 220px; min-width: 0; }
+.toolbar select { flex: 1 1 180px; width: auto; }
+.toolbar label { margin: 0; }
+.toolbar p { flex-basis: 100%; margin: 0; }
+@media (max-width: 820px) {
+  .toolbar input, .toolbar select { flex: none; width: 100%; }
+}

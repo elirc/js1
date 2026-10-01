@@ -17,3 +17,7 @@ A React + Node CRUD project for practicing a real issue-tracking workflow.
 3. Add one field, such as `estimate`, to both the server and client.
 4. Add a new filter, such as priority or assignee.
 5. Replace the in-memory repository with JSON-file or database persistence.
+
+## Junior SWE learning course
+
+[Start the detailed Astra upskilling course](astraupskill/README.md): independent filter dimensions and runtime validation, with a codebase map, worked implementation, executable examples, debugging labs, exercises and solution discussions.

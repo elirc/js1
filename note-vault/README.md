@@ -31,3 +31,7 @@ which is created automatically.
 - Debounce writes so rapid edits don't thrash the disk
 - Add an `archived` flag and a filter for it
 - Replace the JSON file with SQLite (`better-sqlite3`)
+
+## Junior SWE learning course
+
+[Start the detailed Astra upskilling course](astraupskill/README.md): async queues, atomic file replacement and repositories, with a codebase map, worked implementation, executable examples, debugging labs, exercises and solution discussions.

@@ -9,3 +9,7 @@ A browser-based contact manager for practicing:
 - localStorage persistence
 
 Open `index.html` in a browser to run it.
+
+## Junior SWE learning course
+
+[Start the detailed Astra upskilling course](astraupskill/README.md): normalization, validation and edit identity, with a codebase map, worked implementation, executable examples, debugging labs, exercises and solution discussions.

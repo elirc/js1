@@ -57,7 +57,25 @@ renderTransactions();
 
 function loadTransactions() {
   const saved = localStorage.getItem(STORAGE_KEY);
-  return saved ? JSON.parse(saved) : starterTransactions;
+  return normalizeAmounts(saved ? JSON.parse(saved) : starterTransactions);
+}
+
+// Records written by an earlier build were not bounded to two decimals, so a
+// stored 0.105 would be displayed as $0.11 by formatCurrency while the ledger
+// total counted Math.round(0.105 * 100) = 11 cents. Those agree here, but
+// 0.005 rounds to 1 cent in the total and displays as $0.01 in the row while
+// the stored value keeps three decimals - one edit later the two disagree.
+// Snap every amount to the cent once, at the boundary where the data enters
+// the program. Nothing is written back: the normalized value is persisted by
+// the next successful commitTransactions, so a read can never fail a write.
+function normalizeAmounts(records) {
+  if (!Array.isArray(records)) return records;
+  return records.map((record) => {
+    const cents = Math.round(Number(record.amount) * 100);
+    if (!Number.isFinite(cents)) return record;
+    const snapped = cents / 100;
+    return snapped === record.amount ? record : { ...record, amount: snapped };
+  });
 }
 
 function persistTransactions() {
@@ -72,24 +90,20 @@ function saveTransaction(event) {
     description: descriptionInput.value.trim(),
     category: categoryInput.value.trim(),
     type: typeInput.value,
-    amount: Number(amountInput.value),
+    amount: parseCents(amountInput.value) / 100,
     date: dateInput.value
   };
 
-  if (!transaction.description || !transaction.category || !transaction.date || transaction.amount <= 0) {
-    setMessage("Add a valid description, category, amount, and date.");
+  if (!transaction.description || !transaction.category || !isRealDate(transaction.date) || !Number.isFinite(transaction.amount) || !["income", "expense"].includes(transaction.type)) {
+    setMessage("Use a description, category, real date, and a positive amount with at most two decimal places (maximum 999999999.99).");
     return;
   }
 
-  if (editingId) {
-    transactions = transactions.map((current) => current.id === editingId ? transaction : current);
-    setMessage("Transaction updated.");
-  } else {
-    transactions.unshift(transaction);
-    setMessage("Transaction added.");
-  }
-
-  persistTransactions();
+  const next = editingId
+    ? transactions.map((current) => current.id === editingId ? { ...transaction, id: editingId } : current)
+    : [transaction, ...transactions];
+  if (!commitTransactions(next)) return;
+  setMessage(editingId ? "Transaction updated." : "Transaction added.");
   resetForm();
   renderTransactions();
 }
@@ -111,8 +125,7 @@ function editTransaction(id) {
 }
 
 function deleteTransaction(id) {
-  transactions = transactions.filter((transaction) => transaction.id !== id);
-  persistTransactions();
+  if (!commitTransactions(transactions.filter((transaction) => transaction.id !== id))) return;
   resetForm();
   setMessage("Transaction deleted.");
   renderTransactions();
@@ -137,13 +150,13 @@ function getVisibleTransactions() {
 function renderTransactions() {
   const visibleTransactions = getVisibleTransactions();
   const totals = transactions.reduce((summary, transaction) => {
-    summary[transaction.type] += transaction.amount;
+    summary[transaction.type] += Math.round(transaction.amount * 100);
     return summary;
   }, { income: 0, expense: 0 });
 
-  incomeTotal.textContent = formatCurrency(totals.income);
-  expenseTotal.textContent = formatCurrency(totals.expense);
-  balanceTotal.textContent = formatCurrency(totals.income - totals.expense);
+  incomeTotal.textContent = formatCurrency(totals.income / 100);
+  expenseTotal.textContent = formatCurrency(totals.expense / 100);
+  balanceTotal.textContent = formatCurrency((totals.income - totals.expense) / 100);
   transactionsList.innerHTML = "";
   empty.hidden = visibleTransactions.length > 0;
 
@@ -175,6 +188,25 @@ function renderTransactions() {
     card.querySelector("[data-action='delete']").addEventListener("click", () => deleteTransaction(transaction.id));
     transactionsList.append(card);
   });
+}
+
+function parseCents(text) {
+  if (!/^(?:0|[1-9]\d*)(?:\.\d{1,2})?$/.test(text)) return NaN;
+  const [whole, fraction = ""] = text.split(".");
+  const cents = Number(whole) * 100 + Number(fraction.padEnd(2, "0"));
+  return Number.isSafeInteger(cents) && cents > 0 && cents <= 99999999999 ? cents : NaN;
+}
+
+function isRealDate(value) {
+  const parsed = new Date(`${value}T00:00:00Z`);
+  return /^\d{4}-\d{2}-\d{2}$/.test(value) && Number.isFinite(parsed.getTime()) && parsed.toISOString().slice(0, 10) === value;
+}
+
+function commitTransactions(next) {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(next)); }
+  catch { setMessage("Could not save. Your transactions are unchanged; try again."); return false; }
+  transactions = next;
+  return true;
 }
 
 function formatCurrency(value) {

@@ -24,3 +24,7 @@ dragged card, and renumbers the column so the order survives a reload.
 3. Make columns configurable instead of hard-coded.
 
 Open `index.html` in a browser to run it.
+
+## Junior SWE learning course
+
+[Start the detailed Astra upskilling course](astraupskill/README.md): immutable movement, ordering invariants and keyboard access, with a codebase map, worked implementation, executable examples, debugging labs, exercises and solution discussions.

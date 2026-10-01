@@ -40,3 +40,7 @@ npm run dev           # API on :4112, client on :5112
 - Add a `GET /api/rooms/:id/availability?date=` endpoint that returns free gaps.
 - Allow editing a booking in the UI (the `PUT` route already exists).
 - Add a buffer (e.g. 10-minute gap) by padding the range in the constraint.
+
+## Junior SWE learning course
+
+[Start the detailed Astra upskilling course](astraupskill/README.md): half-open intervals, database constraints and timezones, with a codebase map, worked implementation, executable examples, debugging labs, exercises and solution discussions.

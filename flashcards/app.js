@@ -14,7 +14,9 @@ const state = {
   // study session
   studyOrder: [],
   studyIndex: 0,
-  flipped: false
+  flipped: false,
+  unlearnedOnly: false,
+  studyError: ""
 };
 
 const manageTab = document.querySelector("#manage-tab");
@@ -50,7 +52,13 @@ manageTab.addEventListener("click", () => setMode("manage"));
 studyTab.addEventListener("click", () => setMode("study"));
 deckFilter.addEventListener("change", (event) => {
   state.deck = event.target.value;
-  render();
+  if (state.mode === "study") startStudy(false);
+  else render();
+});
+
+document.querySelector("#unlearned-only").addEventListener("change", (event) => {
+  state.unlearnedOnly = event.target.checked;
+  if (state.mode === "study") startStudy(false);
 });
 
 form.addEventListener("submit", handleSubmit);
@@ -212,7 +220,8 @@ function renderManage() {
 }
 
 function startStudy(shuffle) {
-  const cards = visibleCards();
+  const cards = visibleCards().filter((card) => !state.unlearnedOnly || !card.known);
+  state.studyError = "";
   state.studyOrder = cards.map((card) => card.id);
   if (shuffle) shuffleArray(state.studyOrder);
   state.studyIndex = 0;
@@ -233,13 +242,19 @@ function flip() {
 
 function grade(known) {
   const card = currentStudyCard();
-  if (!card) return;
-  card.known = known;
-  saveCards();
-  if (state.studyIndex < state.studyOrder.length - 1) {
-    state.studyIndex += 1;
-    state.flipped = false;
+  if (!card || !state.flipped) return;
+  const next = state.cards.map((item) => item.id === card.id ? { ...item, known } : item);
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+  } catch {
+    state.studyError = "Could not save your grade. Try again; this card has not advanced.";
+    renderStudy();
+    return;
   }
+  state.cards = next;
+  state.studyError = "";
+  state.studyIndex += 1;
+  state.flipped = false;
   renderStudy();
 }
 
@@ -249,15 +264,15 @@ function renderStudy() {
   const controlsDisabled = !card;
 
   flipButton.disabled = controlsDisabled;
-  againButton.disabled = controlsDisabled;
-  knownButton.disabled = controlsDisabled;
+  againButton.disabled = controlsDisabled || !state.flipped;
+  knownButton.disabled = controlsDisabled || !state.flipped;
 
   if (!card) {
-    studyProgress.textContent = "Card 0 of 0";
-    flashcardText.textContent = "No cards in this deck. Add some in Manage.";
+    studyProgress.textContent = total ? `Completed ${total} of ${total}` : "Card 0 of 0";
+    flashcardText.textContent = total ? "Session complete. Start again with Shuffle & restart." : "No matching cards. Change the deck or unlearned filter, or add cards in Manage.";
     flashcardHint.textContent = "";
     flashcard.classList.remove("flipped");
-    studySummary.textContent = "";
+    studySummary.textContent = total ? `${state.studyOrder.filter((id) => state.cards.find((item) => item.id === id)?.known).length}/${total} marked "got it"` : "";
     return;
   }
 
@@ -270,7 +285,7 @@ function renderStudy() {
     const c = state.cards.find((item) => item.id === id);
     return c && c.known;
   }).length;
-  studySummary.textContent = `${knownCount}/${total} marked "got it"`;
+  studySummary.textContent = state.studyError || `${knownCount}/${total} marked "got it"`;
 }
 
 function shuffleArray(array) {

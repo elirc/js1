@@ -79,28 +79,28 @@ export default function App() {
 
       <section className="grid">
         <form className="panel" onSubmit={saveEvent}>
-          <label>Name</label>
-          <input value={form.name} onChange={(event) => setForm({ ...form, name: event.target.value })} />
+          <label htmlFor="field-name">Name</label>
+          <input id="field-name" value={form.name} onChange={(event) => setForm({ ...form, name: event.target.value })} />
 
-          <label>Location</label>
-          <input value={form.location} onChange={(event) => setForm({ ...form, location: event.target.value })} />
+          <label htmlFor="field-location">Location</label>
+          <input id="field-location" value={form.location} onChange={(event) => setForm({ ...form, location: event.target.value })} />
 
-          <label>Date</label>
-          <input type="date" value={form.date} onChange={(event) => setForm({ ...form, date: event.target.value })} />
+          <label htmlFor="field-date">Date</label>
+          <input id="field-date" type="date" value={form.date} onChange={(event) => setForm({ ...form, date: event.target.value })} />
 
           <div className="field-row">
             <div>
-              <label>Capacity</label>
-              <input type="number" value={form.capacity} onChange={(event) => setForm({ ...form, capacity: event.target.value })} />
+              <label htmlFor="field-capacity">Capacity</label>
+              <input id="field-capacity" type="number" value={form.capacity} onChange={(event) => setForm({ ...form, capacity: event.target.value })} />
             </div>
             <div>
-              <label>Registered</label>
-              <input type="number" value={form.registered} onChange={(event) => setForm({ ...form, registered: event.target.value })} />
+              <label htmlFor="field-registered">Registered</label>
+              <input id="field-registered" type="number" value={form.registered} onChange={(event) => setForm({ ...form, registered: event.target.value })} />
             </div>
           </div>
 
-          <label>Status</label>
-          <select value={form.status} onChange={(event) => setForm({ ...form, status: event.target.value })}>
+          <label htmlFor="field-status">Status</label>
+          <select id="field-status" value={form.status} onChange={(event) => setForm({ ...form, status: event.target.value })}>
             <option>Open</option>
             <option>Waitlist</option>
             <option>Closed</option>
@@ -110,7 +110,7 @@ export default function App() {
             <button>{editingId ? "Update event" : "Create event"}</button>
             {editingId && <button type="button" className="secondary" onClick={resetForm}>Cancel</button>}
           </div>
-          <p className="message">{message}</p>
+          <p role="status" className="message">{message}</p>
         </form>
 
         <section className="panel">

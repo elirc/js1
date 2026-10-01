@@ -45,6 +45,7 @@ searchInput.addEventListener("input", (event) => {
   renderContacts();
 });
 
+emailInput.addEventListener("input", () => emailInput.removeAttribute("aria-invalid"));
 renderContacts();
 
 function loadContacts() {
@@ -52,8 +53,17 @@ function loadContacts() {
   return saved ? JSON.parse(saved) : sampleContacts;
 }
 
-function persistContacts() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(contacts));
+function commitContacts(next) {
+  try {
+    // Persist first. A quota/security error must not leave the screen showing
+    // a contact that will disappear on the next reload.
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+  } catch {
+    setMessage("Could not save. Your contacts are unchanged.");
+    return false;
+  }
+  contacts = next;
+  return true;
 }
 
 function saveContact(event) {
@@ -73,15 +83,25 @@ function saveContact(event) {
     return;
   }
 
-  if (editingId) {
-    contacts = contacts.map((item) => item.id === editingId ? contact : item);
-    setMessage("Contact updated.");
-  } else {
-    contacts.unshift(contact);
-    setMessage("Contact added.");
+  const duplicate = contacts.find((item) =>
+    item.id !== editingId && item.email.trim().toLowerCase() === contact.email.toLowerCase()
+  );
+  if (duplicate) {
+    setMessage(`A contact with this email already exists: ${duplicate.name}.`);
+    emailInput.setAttribute("aria-invalid", "true");
+    emailInput.focus();
+    return;
   }
+  emailInput.removeAttribute("aria-invalid");
 
-  persistContacts();
+  const next = editingId
+    ? contacts.map((item) => item.id === editingId ? contact : item)
+    : [contact, ...contacts];
+
+  // Validation passed. Persist before publishing, and keep the form usable if the write fails.
+  if (!commitContacts(next)) return;
+
+  setMessage(editingId ? "Contact updated." : "Contact added.");
   resetForm();
   renderContacts();
 }
@@ -103,14 +123,14 @@ function editContact(id) {
 }
 
 function deleteContact(id) {
-  contacts = contacts.filter((contact) => contact.id !== id);
-  persistContacts();
+  if (!commitContacts(contacts.filter((contact) => contact.id !== id))) return;
   resetForm();
   setMessage("Contact deleted.");
   renderContacts();
 }
 
 function resetForm() {
+  emailInput.removeAttribute("aria-invalid");
   form.reset();
   idInput.value = "";
   editingId = null;

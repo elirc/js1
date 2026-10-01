@@ -22,3 +22,7 @@ date math and derived stats rather than the form.
 3. Add a "best streak" stat alongside the current streak.
 
 Open `index.html` in a browser to run it.
+
+## Junior SWE learning course
+
+[Start the detailed Astra upskilling course](astraupskill/README.md): local dates, derived statistics and edge cases, with a codebase map, worked implementation, executable examples, debugging labs, exercises and solution discussions.

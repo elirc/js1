@@ -1,3 +1,4 @@
+import { pathToFileURL } from "node:url";
 import "dotenv/config";
 import express from "express";
 import type { Request, Response, NextFunction } from "express";
@@ -12,11 +13,12 @@ import type {
   NewInvoice
 } from "../../shared/types.js";
 
-const app = express();
+export const app = express();
 const port = Number(process.env.PORT ?? 4110);
 
 app.use(cors());
 app.use(express.json());
+app.param("id",(_req,res,next,value) => { if (!validId(value)) return res.status(400).json({ error: "Use a valid record id." }); next(); });
 
 const STATUSES: InvoiceStatus[] = ["draft", "sent", "paid"];
 
@@ -44,20 +46,20 @@ function toSummary(row: SummaryRow): InvoiceSummary {
     taxRate,
     subtotal,
     tax,
-    total: subtotal + tax
+    total: Math.round((subtotal + tax) * 100) / 100
   };
 }
 
 // --- Clients ---------------------------------------------------------------
 
-app.get("/api/clients", async (_req, res) => {
+app.get("/api/clients", asyncRoute(async (_req, res) => {
   const rows = await query<Client>(
     "SELECT id, name, email FROM clients ORDER BY name"
   );
   res.json(rows);
-});
+}));
 
-app.post("/api/clients", async (req, res) => {
+app.post("/api/clients", asyncRoute(async (req, res) => {
   const name = String(req.body.name ?? "").trim();
   const email = String(req.body.email ?? "").trim();
   if (name.length < 2) return res.status(400).json({ error: "Name is required." });
@@ -69,11 +71,11 @@ app.post("/api/clients", async (req, res) => {
     [name, email]
   );
   res.status(201).json(client);
-});
+}));
 
 // --- Invoices --------------------------------------------------------------
 
-app.get("/api/invoices", async (req, res) => {
+app.get("/api/invoices", asyncRoute(async (req, res) => {
   const status = req.query.status;
   const filterByStatus = typeof status === "string" && STATUSES.includes(status as InvoiceStatus);
 
@@ -93,15 +95,15 @@ app.get("/api/invoices", async (req, res) => {
     [filterByStatus ? status : null]
   );
   res.json(rows.map(toSummary));
-});
+}));
 
-app.get("/api/invoices/:id", async (req, res) => {
-  const invoice = await loadInvoice(req.params.id);
+app.get("/api/invoices/:id", asyncRoute(async (req, res) => {
+  const invoice = await loadInvoice(recordId(req));
   if (!invoice) return res.status(404).json({ error: "Invoice not found." });
   res.json(invoice);
-});
+}));
 
-app.post("/api/invoices", async (req, res, next) => {
+app.post("/api/invoices", asyncRoute(async (req, res, next) => {
   try {
     const input = parseInvoice(req.body);
     // The invoice header and its items must be inserted together or not at all.
@@ -125,65 +127,66 @@ app.post("/api/invoices", async (req, res, next) => {
   } catch (error) {
     next(error);
   }
-});
+}));
 
-app.put("/api/invoices/:id", async (req, res, next) => {
+app.put("/api/invoices/:id", asyncRoute(async (req, res, next) => {
   try {
     const input = parseInvoice(req.body);
     const updated = await withTransaction(async (client) => {
       const { rowCount } = await client.query(
         `UPDATE invoices SET client_id = $2, status = $3, issued_date = $4, tax_rate = $5
           WHERE id = $1`,
-        [req.params.id, input.clientId, input.status, input.issuedDate, input.taxRate]
+        [recordId(req), input.clientId, input.status, input.issuedDate, input.taxRate]
       );
       if (rowCount === 0) return false;
       // Simplest correct approach: replace the line items wholesale.
-      await client.query("DELETE FROM invoice_items WHERE invoice_id = $1", [req.params.id]);
+      await client.query("DELETE FROM invoice_items WHERE invoice_id = $1", [recordId(req)]);
       for (const item of input.items) {
         await client.query(
           `INSERT INTO invoice_items (invoice_id, description, quantity, unit_price)
            VALUES ($1, $2, $3, $4)`,
-          [req.params.id, item.description, item.quantity, item.unitPrice]
+          [recordId(req), item.description, item.quantity, item.unitPrice]
         );
       }
       return true;
     });
     if (!updated) return res.status(404).json({ error: "Invoice not found." });
-    res.json(await loadInvoice(req.params.id));
+    res.json(await loadInvoice(recordId(req)));
   } catch (error) {
     next(error);
   }
-});
+}));
 
-app.patch("/api/invoices/:id/status", async (req, res) => {
+app.patch("/api/invoices/:id/status", asyncRoute(async (req, res) => {
   const status = req.body.status as InvoiceStatus;
   if (!STATUSES.includes(status)) {
     return res.status(400).json({ error: "Invalid status." });
   }
   const { rowCount } = await pool.query(
     "UPDATE invoices SET status = $2 WHERE id = $1",
-    [req.params.id, status]
+    [recordId(req), status]
   );
   if (rowCount === 0) return res.status(404).json({ error: "Invoice not found." });
-  res.json(await loadInvoice(req.params.id));
-});
+  res.json(await loadInvoice(recordId(req)));
+}));
 
-app.delete("/api/invoices/:id", async (req, res) => {
-  const { rowCount } = await pool.query("DELETE FROM invoices WHERE id = $1", [req.params.id]);
+app.delete("/api/invoices/:id", asyncRoute(async (req, res) => {
+  const { rowCount } = await pool.query("DELETE FROM invoices WHERE id = $1", [recordId(req)]);
   if (rowCount === 0) return res.status(404).json({ error: "Invoice not found." });
   res.status(204).send();
-});
+}));
 
 // Central error handler: validation errors become 400, everything else 500.
 app.use((error: unknown, _req: Request, res: Response, _next: NextFunction) => {
   if (error instanceof ValidationError) {
     return res.status(400).json({ error: error.message });
   }
+  if (["22P02","23503","23505","23514","22003"].includes((error as { code?: string }).code ?? "")) return res.status(400).json({ error: "Invalid reference or value." });
   console.error(error);
   res.status(500).json({ error: "Something went wrong." });
 });
 
-app.listen(port, () => {
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) app.listen(port, () => {
   console.log(`Invoice Studio API on http://localhost:${port}`);
 });
 
@@ -225,7 +228,12 @@ async function loadInvoice(id: string): Promise<Invoice | null> {
 class ValidationError extends Error {}
 
 function parseInvoice(body: unknown): NewInvoice {
+  if (!body || typeof body !== "object" || Array.isArray(body)) throw new ValidationError("Send an invoice object.");
   const data = body as Partial<NewInvoice>;
+  if (!validId(data.clientId)) throw new ValidationError("Choose a valid client id.");
+  if (typeof data.issuedDate !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(data.issuedDate) || Number.isNaN(Date.parse(data.issuedDate+"T00:00:00Z")) || new Date(data.issuedDate+"T00:00:00Z").toISOString().slice(0,10) !== data.issuedDate)
+    throw new ValidationError("Use a real issue date in YYYY-MM-DD format.");
+  if (!decimal(data.taxRate,100)) throw new ValidationError("Tax rate must be 0-100 with at most two decimal places.");
   if (!data.clientId) throw new ValidationError("Choose a client.");
   if (!data.status || !STATUSES.includes(data.status)) {
     throw new ValidationError("Choose a valid status.");
@@ -235,8 +243,10 @@ function parseInvoice(body: unknown): NewInvoice {
   if (!(taxRate >= 0)) throw new ValidationError("Tax rate must be zero or more.");
 
   const items = Array.isArray(data.items) ? data.items : [];
-  if (items.length === 0) throw new ValidationError("Add at least one line item.");
+  if (items.length === 0 || items.length > 100) throw new ValidationError("Add at least one line item.");
   for (const item of items) {
+    if (!item || typeof item !== "object" || Array.isArray(item) || typeof item.description !== "string" || item.description.length > 500) throw new ValidationError("Each line needs text of at most 500 characters.");
+    if (!(typeof item.quantity === "number" || typeof item.quantity === "string") || !Number.isSafeInteger(Number(item.quantity)) || Number(item.quantity) > 1000000 || !decimal(item.unitPrice,9999999999.99)) throw new ValidationError("Use whole quantities and prices with at most two decimal places.");
     if (!item.description?.trim()) throw new ValidationError("Every line needs a description.");
     if (!(Number(item.quantity) > 0)) throw new ValidationError("Quantity must be positive.");
     if (!(Number(item.unitPrice) >= 0)) throw new ValidationError("Unit price must be zero or more.");
@@ -254,3 +264,13 @@ function parseInvoice(body: unknown): NewInvoice {
     }))
   };
 }
+
+function asyncRoute(handler: (req: express.Request, res: express.Response, next: express.NextFunction) => Promise<unknown>): express.RequestHandler {
+  return (req,res,next) => { Promise.resolve(handler(req,res,next)).catch(next); };
+}
+
+function decimal(value: unknown, maximum: number) { return (typeof value === "number" || typeof value === "string") && /^\d+(?:\.\d{1,2})?$/.test(String(value)) && Number(value) <= maximum; }
+
+function validId(value: unknown): value is string { return typeof value === "string" && /^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/i.test(value); }
+
+function recordId(req: express.Request): string { const id = req.params.id; if (!validId(id)) throw new ValidationError("Use a valid record id."); return id; }

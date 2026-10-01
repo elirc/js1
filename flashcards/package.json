@@ -1,0 +1,10 @@
+{
+  "name": "astra-browser-exercise-11",
+  "private": true,
+  "scripts": {
+    "test": "node --test test/*.test.cjs"
+  },
+  "devDependencies": {
+    "jsdom": "25.0.1"
+  }
+}

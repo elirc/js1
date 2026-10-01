@@ -64,6 +64,9 @@
             <option value="status">Sort by status</option>
             <option value="rating">Sort by rating</option>
           </select>
+        <label for="status-filter">Reading status</label>
+        <select id="status-filter"><option value="All">All statuses</option><option>Want to Read</option><option>Reading</option><option>Finished</option></select>
+        <p id="reading-summary" role="status"></p>
         </div>
         <div id="books" class="book-grid" aria-live="polite"></div>
         <p id="empty" class="empty" hidden>No books match the current view.</p>
