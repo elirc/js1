@@ -21,7 +21,7 @@ It is a teaching snapshot; the linked source is authoritative if you later edit 
 surrounding code for callers and setup.
 
 **What changed here.** The whole file is new. In
-`AstraOrganized2/astrafinalplan/implementation/batch02/backups/18/server/src/index.ts` there was
+`git show 606e0e6:room-booking/server/src/index.ts` there was
 no `validation.ts` at all: `parseBooking` lived at the bottom of the route file (lines 135-152)
 and looked like this, in full:
 

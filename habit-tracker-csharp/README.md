@@ -1,17 +1,17 @@
 ﻿# Habit Tracker - C# Version
 
-This folder is a C# / ASP.NET Core Minimal API version of the original $(@{Slug=habit-tracker; Title=Habit Tracker; Entity=Habit; Route=habits; Filter=Frequency; Fields=System.Object[]}.Slug) project. It keeps the same CRUD learning goal, but moves the implementation into C# concepts you will see in larger corporate codebases.
+This folder is a C# / ASP.NET Core Minimal API version of the original `../habit-tracker` project. It keeps the same CRUD learning goal, but moves the implementation into C# concepts you will see in larger corporate codebases.
 
 ## What to study
 
 - Program.cs maps HTTP endpoints to handlers.
 - Models.cs defines the domain record, request DTO, validation rules, and error response.
 - Repository.cs owns in-memory storage, filtering, creation, updates, and deletes.
-- $csprojName.csproj shows the project as an ASP.NET Core web app targeting .NET 8.
+- HabitTrackerCSharp.csproj shows the project as an ASP.NET Core web app targeting .NET 8.
 
 ## API shape
 
-- GET /api/=value&filter=value lists records.
+- GET /api/habits?search=value&filter=value lists records (both query parameters optional).
 - GET /api/habits/{id} fetches one record.
 - POST /api/habits creates a record.
 - PUT /api/habits/{id} replaces a record.

@@ -16,7 +16,7 @@ Before running anything, write the exact expected stored values and visible resp
 
 ## Actual implementation excerpt
 
-The lines below are the ones Astra changed (compare `AstraOrganized2/astrafinalplan/implementation/batch04/backups/55/server/src/index.ts` with `diff --strip-trailing-cr -w`): the movement route now runs inside `withTransaction`, takes `lockProduct` before reading `balanceOf`, and rejects an over-issue with a 400 whose message carries the real balance; the transfer route reuses the same lock and inserts both rows in one transaction. The linked source is authoritative if you later edit the project.
+The lines below are the ones Astra changed (run `git diff -w 606e0e6 -- server/src/index.ts` from this project folder): the movement route now runs inside `withTransaction`, takes `lockProduct` before reading `balanceOf`, and rejects an over-issue with a 400 whose message carries the real balance; the transfer route reuses the same lock and inserts both rows in one transaction. The linked source is authoritative if you later edit the project.
 
 ```typescript
 app.post(

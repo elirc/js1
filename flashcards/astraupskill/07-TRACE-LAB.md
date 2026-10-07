@@ -45,7 +45,7 @@ buttons at `app.js:274-275` are a courtesy; this line is the rule.
 **Boundary 4 — building the candidate value (`app.js:246`).**
 `state.cards.map((item) => item.id === card.id ? { ...item, known } : item)` constructs a whole
 replacement array; it does not assign `card.known = known`. That is the change: the old code at
-`backups/11/app.js:236` mutated the live record first and saved afterwards. Write out `next`
+`git show 606e0e6:flashcards/app.js` (line 236) mutated the live record first and saved afterwards. Write out `next`
 for the fixture — one object differs from `state.cards` by one field, and `state.cards` itself
 is still untouched at this point.
 

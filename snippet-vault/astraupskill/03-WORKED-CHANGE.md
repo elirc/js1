@@ -21,7 +21,7 @@ the error-classification helper was added above it). It is a teaching snapshot; 
 is authoritative if you later edit the project. Read surrounding code for callers and setup.
 
 **What changed here.** In
-`AstraOrganized2/astrafinalplan/implementation/batch02/backups/17/src/store.js`, `saveSnippet`
+`git show 606e0e6:snippet-vault/src/store.js`, `saveSnippet`
 published before it persisted and validated nothing:
 
 ```diff

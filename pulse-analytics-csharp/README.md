@@ -1,17 +1,17 @@
 ﻿# Pulse Analytics - C# Version
 
-This folder is a C# / ASP.NET Core Minimal API version of the original $(@{Slug=pulse-analytics; Title=Pulse Analytics; Entity=MetricEvent; Route=metric-events; Filter=Channel; Fields=System.Object[]}.Slug) project. It keeps the same CRUD learning goal, but moves the implementation into C# concepts you will see in larger corporate codebases.
+This folder is a C# / ASP.NET Core Minimal API version of the original `../pulse-analytics` project. It keeps the same CRUD learning goal, but moves the implementation into C# concepts you will see in larger corporate codebases.
 
 ## What to study
 
 - Program.cs maps HTTP endpoints to handlers.
 - Models.cs defines the domain record, request DTO, validation rules, and error response.
 - Repository.cs owns in-memory storage, filtering, creation, updates, and deletes.
-- $csprojName.csproj shows the project as an ASP.NET Core web app targeting .NET 8.
+- PulseAnalyticsCSharp.csproj shows the project as an ASP.NET Core web app targeting .NET 8.
 
 ## API shape
 
-- GET /api/=value&filter=value lists records.
+- GET /api/metric-events?search=value&filter=value lists records (both query parameters optional).
 - GET /api/metric-events/{id} fetches one record.
 - POST /api/metric-events creates a record.
 - PUT /api/metric-events/{id} replaces a record.

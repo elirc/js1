@@ -16,7 +16,7 @@ Before running anything, write the exact expected stored values and visible resp
 
 ## Actual implementation excerpt
 
-The lines below are the ones Astra changed (compare `AstraOrganized2/astrafinalplan/implementation/batch03/backups/26/server/server.js` with `diff --strip-trailing-cr -w`): the `whole()` normalization of `page` and `pageSize` (a malformed page becomes 1, a page size outside 1..1000000 becomes 5, a valid one is capped at 50) and the `id` tie-break in the sort that makes page boundaries stable. The linked source is authoritative if you later edit the project.
+The lines below are the ones Astra changed (run `git diff -w 606e0e6 -- server/server.js` from this project folder): the `whole()` normalization of `page` and `pageSize` (a malformed page becomes 1, a page size outside 1..1000000 becomes 5, a valid one is capped at 50) and the `id` tie-break in the sort that makes page boundaries stable. The linked source is authoritative if you later edit the project.
 
 ```javascript
 // server/server.js:27 (before: page = Number(req.query.page) || 1; pageSize = Number(req.query.pageSize) || 5)

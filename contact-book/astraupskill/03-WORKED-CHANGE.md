@@ -62,7 +62,7 @@ function saveContact(event) {
 
 ### The changed lines, isolated
 
-The function above is mostly pre-existing code. Diff it against `AstraOrganized2/astrafinalplan/implementation/backups/02/app.js` and only two regions come back.
+The function above is mostly pre-existing code. Diff it against `git show 606e0e6:contact-book/app.js` and only two regions come back.
 
 **The uniqueness guard** (new, `app.js:86-95`) - this was the delivered change:
 

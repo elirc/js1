@@ -16,7 +16,7 @@ Before running anything, write the exact expected stored values and visible resp
 
 ## Actual implementation excerpt
 
-The lines below are the ones Astra changed (compare `AstraOrganized2/astrafinalplan/implementation/batch04/backups/57/server/src/index.ts` with `diff --strip-trailing-cr -w`): the event-shape guard in `connectSocket` that drops malformed or oversize events instead of crashing, the insert-only handler with a 1011 close on failure, and the listener's reconnect loop. `maxPayload: 16384` on the `WebSocketServer` is the other bound. The linked source is authoritative if you later edit the project.
+The lines below are the ones Astra changed (run `git diff -w 606e0e6 -- server/src/index.ts` from this project folder): the event-shape guard in `connectSocket` that drops malformed or oversize events instead of crashing, the insert-only handler with a 1011 close on failure, and the listener's reconnect loop. `maxPayload: 16384` on the `WebSocketServer` is the other bound. The linked source is authoritative if you later edit the project.
 
 ```typescript
   socket.on("message", async (data) => {

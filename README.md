@@ -1,8 +1,14 @@
 # JavaScript CRUD Practice Projects
 
-Standalone vanilla JavaScript CRUD apps live in this workspace. Each is
-intentionally dependency-free — open the folder's `index.html` in a browser and
-start practicing Create, Read, Update, and Delete workflows.
+This workspace holds 96 standalone CRUD practice projects (counted 2026-10-06):
+11 vanilla JavaScript apps, 9 React + Express apps, 8 TypeScript + Postgres apps,
+10 more React + Express apps, 10 more TypeScript + Postgres apps, 20 ASP.NET Core +
+Postgres apps, and 28 in-memory C# mirrors of the JavaScript projects. Each section
+below lists one group.
+
+The vanilla apps are dependency-free at runtime — open the folder's `index.html`
+in a browser and start practicing Create, Read, Update, and Delete workflows.
+(Their `package.json` exists only for the `npm test` suite; most of those suites use `jsdom`.)
 
 **Core five (form-driven CRUD):**
 
@@ -141,12 +147,46 @@ stories.
 19. `vendor-onboarding-dotnet` - vendor onboarding records, procurement owners, vendor categories, expected spend, and review workflow (API 4319)
 20. `content-calendar-dotnet` - marketing content items, owners, channels, campaign budgets, and publishing workflow (API 4320)
 
+## C# Mirrors of the JavaScript Projects
+
+Twenty-eight `<name>-csharp` folders re-implement a JavaScript project from the
+sections above as an ASP.NET Core Minimal API targeting .NET 8. They are much
+smaller than the originals: `Program.cs` maps one `/api/<resource>` route group,
+`Models.cs` holds the record, request DTO and validation rules, and
+`Repository.cs` keeps the data in an in-memory `List` (no database, even when the
+original used Postgres). Each has a `README.md` and `USER_STORIES.md` but no
+`CODEBASE_GUIDE.md`, and no port is configured, so `dotnet run` uses the ASP.NET
+Core default. Compare each one with its sibling folder (for example
+`task-board-csharp` against `task-board`).
+
+The mirrored projects are: budget-tracker, contact-book, course-roster,
+event-admin, flashcards, focus-timer, forum-search, habit-tracker,
+invoice-studio, issue-desk, job-pipeline, kanban-flow, live-chat, mini-blog,
+note-vault, org-explorer, pantry-inventory, poll-studio, pulse-analytics,
+reading-list, recipe-studio, room-booking, secure-notes, snippet-vault,
+stock-catalog, support-tickets, task-board, and warehouse-ledger.
+
 ## Codebase Study Guides
 
-Every project folder includes `CODEBASE_GUIDE.md`. These guides are written for
+The 68 project folders that are not C# mirrors each include `CODEBASE_GUIDE.md`. These guides are written for
 upskilling toward larger corporate SWE codebases: they explain the architecture,
 data flow, important code snippets, validation, API boundaries, derived state,
 database guarantees where relevant, and extension exercises.
+
+## Upskilling Courses (`astraupskill/`)
+
+The 48 JavaScript and TypeScript project folders (every project above except the
+20 `-dotnet` apps and the 28 `-csharp` mirrors) also contain an `astraupskill/`
+course: `README.md`, seven numbered chapters (codebase map, concepts, worked
+change, testing and debugging, practice, solutions and review, trace lab) and a
+`VERIFICATION.md`. Each course is built around one reliability change made to
+that project's code, and the same folders gained a `test/` directory runnable with
+`npm test` after `npm install`. Several courses say at the top that they are a
+near-identical rendering of another project's course; do the canonical one first.
+
+The code as it was before those changes is this repository's initial commit
+(`606e0e6`). From a project folder, `git diff -w 606e0e6 -- .` shows the delivered
+change with line-ending noise suppressed.
 
 Suggested reading path:
 

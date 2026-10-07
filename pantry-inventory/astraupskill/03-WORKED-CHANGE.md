@@ -21,7 +21,7 @@ linked source is authoritative if you later edit the project. Read surrounding c
 and setup.
 
 **What changed here.** In
-`AstraOrganized2/astrafinalplan/implementation/batch02/backups/16/app.js` the filter had one
+`git show 606e0e6:pantry-inventory/app.js` the filter had one
 predicate and the status had one ternary:
 
 ```diff

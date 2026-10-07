@@ -16,7 +16,7 @@ Before running anything, write the exact expected stored values and visible resp
 
 ## Actual implementation excerpt
 
-The lines below are the ones that changed (compare `AstraOrganized2/astrafinalplan/implementation/batch04/backups/52/server/src/index.ts` with `diff --strip-trailing-cr -w`): the PATCH route now locks the row with `FOR UPDATE`, returns early on a no-op status, and writes the update and its audit row in one transaction; `parseItem` gained the finite/range check and, in this course's fix pass, the whole-cent rule. The linked source is authoritative if you later edit the project.
+The lines below are the ones that changed (run `git diff -w 606e0e6 -- server/src/index.ts` from this project folder): the PATCH route now locks the row with `FOR UPDATE`, returns early on a no-op status, and writes the update and its audit row in one transaction; `parseItem` gained the finite/range check and, in this course's fix pass, the whole-cent rule. The linked source is authoritative if you later edit the project.
 
 ```typescript
 app.patch(

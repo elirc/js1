@@ -16,7 +16,7 @@ Before running anything, write the exact expected stored values and visible resp
 
 ## Actual implementation excerpt
 
-The lines below are what remains after the fix pass: `validatePost` and `validateComment` are now one gate each (`isText` with bounds), and the nested comment route answers 404 when `addComment` finds no parent. Astra's delivered change was the type gate; the duplicated lower checks it left behind were removed here, so the worked example no longer prints dead code. Compare with `AstraOrganized2/astrafinalplan/implementation/batch03/backups/29/server/server.js`.
+The lines below are what remains after the fix pass: `validatePost` and `validateComment` are now one gate each (`isText` with bounds), and the nested comment route answers 404 when `addComment` finds no parent. Astra's delivered change was the type gate; the duplicated lower checks it left behind were removed here, so the worked example no longer prints dead code. Compare with `git show 606e0e6:mini-blog/server/server.js`.
 
 ```javascript
 // server/server.js:79

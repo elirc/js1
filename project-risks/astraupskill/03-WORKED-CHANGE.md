@@ -16,7 +16,7 @@ Before running anything, write the exact expected stored values and visible resp
 
 ## Actual implementation excerpt
 
-The lines below are the ones Astra changed (compare `AstraOrganized2/astrafinalplan/implementation/batch03/backups/42/server/server.js` with `diff --strip-trailing-cr -w`): the status route and the repository's `setStatus`, whose equality guard makes a repeated status a no-op and whose paired record replacement and history entry happen in one synchronous step. The linked source is authoritative if you later edit the project.
+The lines below are the ones Astra changed (run `git diff -w 606e0e6 -- server/server.js` from this project folder): the status route and the repository's `setStatus`, whose equality guard makes a repeated status a no-op and whose paired record replacement and history entry happen in one synchronous step. The linked source is authoritative if you later edit the project.
 
 ```javascript
 // server/server.js:34

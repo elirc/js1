@@ -40,7 +40,7 @@ linked source is authoritative if you later edit the project. Read surrounding c
 and setup.
 
 **Every line of this function changed.** Here is what it was before, from
-`AstraOrganized2/astrafinalplan/implementation/batch02/backups/11/app.js:235-245`:
+`git show 606e0e6:flashcards/app.js` (lines 235-245):
 
 ```javascript
 function grade(known) {

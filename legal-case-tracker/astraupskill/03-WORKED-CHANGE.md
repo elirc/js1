@@ -16,7 +16,7 @@ Before running anything, write the exact expected stored values and visible resp
 
 ## Actual implementation excerpt
 
-The lines below are the ones Astra changed (compare `AstraOrganized2/astrafinalplan/implementation/batch04/backups/51/server/server.js` with `diff --strip-trailing-cr -w`). `setStatus` (line 290) no longer delegates to `update`, so a repeated status writes nothing and a real change writes exactly one `status` entry together with the record; `validateItem` gained the finite, nonnegative amount check (line 147) and `validDate` (line 349) rejects calendar-impossible dates. The linked source is authoritative if you later edit the project.
+The lines below are the ones Astra changed (run `git diff -w 606e0e6 -- server/server.js` from this project folder). `setStatus` (line 290) no longer delegates to `update`, so a repeated status writes nothing and a real change writes exactly one `status` entry together with the record; `validateItem` gained the finite, nonnegative amount check (line 147) and `validDate` (line 349) rejects calendar-impossible dates. The linked source is authoritative if you later edit the project.
 
 ```javascript
     setStatus(id, status) {

@@ -48,7 +48,7 @@ An inverse operation needs enough information to reconstruct the prior intent. S
 
 ### The changed lines in `handleSubmit`
 
-`commitBoard` is new, so every line of the excerpt above is a changed line. The other half of the change is smaller and easier to miss. In the pre-change file (`AstraOrganized2/astrafinalplan/implementation/backups/01/app.js:84-92`) the create and edit branch mutated `state` first and then called the unguarded `saveTasks()`:
+`commitBoard` is new, so every line of the excerpt above is a changed line. The other half of the change is smaller and easier to miss. In the pre-change file (`git show 606e0e6:task-board/app.js`, lines 84-92) the create and edit branch mutated `state` first and then called the unguarded `saveTasks()`:
 
 ```javascript
   if (state.editingId) {

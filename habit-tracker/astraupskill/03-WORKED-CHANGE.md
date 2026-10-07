@@ -21,7 +21,7 @@ linked source is authoritative if you later edit the project. Read surrounding c
 and setup.
 
 **This whole function is new.** `bestStreak` does not exist at all in
-`AstraOrganized2/astrafinalplan/implementation/batch02/backups/12/app.js`; the change inserts it
+`git show 606e0e6:habit-tracker/app.js`; the change inserts it
 between `currentStreak` and `button`. Two other edits ship with it, and both are one-liners you
 should read alongside it:
 

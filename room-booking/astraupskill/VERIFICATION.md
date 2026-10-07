@@ -39,7 +39,7 @@ Browser checks used the real built client with controlled API responses, verifyi
 
 Install dependencies at the project root. Configure DATABASE_URL for a new empty development database. The existing db:setup script resets its tables, so use it only for that disposable setup. Run `npm run dev`, `npm run build` and `npm run typecheck` at the root. Tests use a separate astra_test_* database and run with `npm test` at the root.
 
-Reading the diff: the files Astra touched were re-saved with CRLF line endings and Prettier formatting, so a plain `diff` shows whole files as changed. Compare with `git diff -w`, or `diff -r --strip-trailing-cr -w <backup> <project>` against the pre-change backup, to see only the real edits.
+Reading the diff: the files Astra touched were re-saved with CRLF line endings and Prettier formatting, so a plain `diff` shows whole files as changed. Compare with `git diff -w 606e0e6 -- .` from this project folder, to see only the real edits.
 
 ## Database test setup
 
@@ -56,4 +56,4 @@ Tests reject differently named databases. The user must be allowed to create sch
 
 These checks cover the implemented improvements and described regression cases. They do not certify unrelated features or production readiness. Exercises in chapter 5 remain learner work. Source, test and setup limitations are explained in the concepts and trace lab.
 
-Machine-readable results and logs are retained in AstraOrganized2/astrafinalplan/implementation/batch02. The combined report is in AstraOrganized2/astrdocs/ALL_20_PROJECTS_REPORT.md.
+The authoring workspace's logs, screenshots, backups and batch reports were not committed to this repository. The pre-change source is this repository's initial commit, so `git diff -w 606e0e6 -- .` run from this project folder shows the delivered change.

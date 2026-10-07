@@ -16,7 +16,7 @@ Before running anything, write the exact expected stored values and visible resp
 
 ## Actual implementation excerpt
 
-The lines below are the ones Astra changed (compare `AstraOrganized2/astrafinalplan/implementation/batch04/backups/56/server/server.js` with `diff --strip-trailing-cr -w`): the JSON-object guard, the normalized email and bounded password in `register` (and the same normalization in `login`), the new owner-scoped `GET /api/notes/:id`, and the bounded `validateNote`. `requireAuth` and `findOwnedNote` were already there; session expiry was added in this course's fix pass (see chapter 2). The linked source is authoritative if you later edit the project.
+The lines below are the ones Astra changed (run `git diff -w 606e0e6 -- server/server.js` from this project folder): the JSON-object guard, the normalized email and bounded password in `register` (and the same normalization in `login`), the new owner-scoped `GET /api/notes/:id`, and the bounded `validateNote`. `requireAuth` and `findOwnedNote` were already there; session expiry was added in this course's fix pass (see chapter 2). The linked source is authoritative if you later edit the project.
 
 ```javascript
 app.use((req, res, next) => {

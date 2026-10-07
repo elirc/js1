@@ -21,7 +21,7 @@ linked source is authoritative if you later edit the project. Read surrounding c
 and setup.
 
 **This whole function is new**, and so is every line that calls it.
-`AstraOrganized2/astrafinalplan/implementation/batch02/backups/15/app.js` had no parser at all -
+`git show 606e0e6:budget-tracker/app.js` had no parser at all -
 it read the amount like this:
 
 ```diff

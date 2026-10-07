@@ -56,10 +56,10 @@ The test database account needs permission to create and drop its own schemas. T
 
 Read [test/database.ts](../test/database.ts) before experimenting. It assigns DATABASE_URL to a unique search_path before importing the application pool, so the tests exercise isolated tables through real HTTP. SQL failure injection is installed only in that disposable schema. An interrupted process may leave a test schema behind; inspect and remove only the exact schema owned by that run. Reusing a development database name is intentionally rejected. The source uses parameters for values; never concatenate user strings into SQL in a practice extension.
 
-Reading the diff: the files Astra touched were re-saved with CRLF line endings and Prettier formatting, so a plain `diff` shows whole files as changed. Compare with `git diff -w`, or `diff -r --strip-trailing-cr -w <backup> <project>` against the pre-change backup, to see only the real edits.
+Reading the diff: the files Astra touched were re-saved with CRLF line endings and Prettier formatting, so a plain `diff` shows whole files as changed. Compare with `git diff -w 606e0e6 -- .` from this project folder, to see only the real edits.
 
 ## Limits
 
 These checks target the implemented improvement and its meaningful failure boundaries. Exercises remain future learner work. The concepts and trace lab explain limits such as in-memory restart behavior, status-command semantics, date representation and transaction scope where relevant.
 
-After copying to the original folders, delivery hashes and course links are checked by the batch verification script. Machine-readable results, command logs, screenshots, source diffs and backups are retained in AstraOrganized2/astrafinalplan/implementation/batch03. The combined report is AstraOrganized2/astrdocs/ALL_50_PROJECTS_REPORT.md.
+The authoring workspace's logs, screenshots, backups and batch reports were not committed to this repository. The pre-change source is this repository's initial commit, so `git diff -w 606e0e6 -- .` run from this project folder shows the delivered change.

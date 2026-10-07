@@ -21,7 +21,7 @@ linked source is authoritative if you later edit the project. Read surrounding c
 and setup.
 
 **What changed here.** The `filter` body and the whole `sort` call are new; in
-`AstraOrganized2/astrafinalplan/implementation/batch02/backups/13/app.js` the same function read:
+`git show 606e0e6:reading-list/app.js` the same function read:
 
 ```diff
    return [...books]
@@ -41,8 +41,7 @@ and setup.
 ```
 
 Reproduce that diff yourself with
-`diff -w --strip-trailing-cr -u <backup>/13/app.js app.js`, where `<backup>` is
-`AstraOrganized2/astrafinalplan/implementation/batch02/backups`. Two further hunks appear in it
+`git diff -w 606e0e6 -- app.js` from this project folder (the repository's initial commit holds the pre-change file). Two further hunks appear in it
 and belong to the same change: the `let statusFilter = "All"` declaration at `app.js:26` and the
 `#status-filter` change listener at `app.js:43-46`.
 

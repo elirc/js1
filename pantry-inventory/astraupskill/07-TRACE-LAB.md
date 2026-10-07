@@ -54,7 +54,7 @@ local in Berlin, and write both answers down. This is the most reusable line in 
 `isExpired`, `app.js:185`).**
 `const isLow = item.quantity <= item.minimum;` and `item.expires < today`. They are computed
 separately and combined only in the filter expression, which is what lets a row be
-"Stock OK · Expired". In `backups/16/app.js` the status was a single ternary -
+"Stock OK · Expired". In `git show 606e0e6:pantry-inventory/app.js` the status was a single ternary -
 `item.quantity <= item.minimum ? "Low" : "Fresh"` - so a fully stocked expired jar read "Fresh".
 Build the four-row truth table: low+expired, low+fresh, stocked+expired, stocked+fresh. The
 Expired filter accepts rows 1 and 3; Low accepts 1 and 2; "In stock & not expired" accepts only

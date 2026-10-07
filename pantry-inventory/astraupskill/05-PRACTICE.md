@@ -24,7 +24,7 @@ whether it is *also* "expiring soon" and write your answer down before you code,
 changes the filter expression.
 
 The trap, and the reason this is exercise 1: do **not** add `"Expiring"` as a third value of the
-status. That is precisely the mistake this lesson undid - `backups/16/app.js` had
+status. That is precisely the mistake this lesson undid - `git show 606e0e6:pantry-inventory/app.js` had
 `item.quantity <= item.minimum ? "Low" : "Fresh"` and a fully stocked expired jar therefore read
 "Fresh". Add a third independent predicate, `isExpiringSoon(item, today)`, beside `isExpired`
 (`app.js:185`), and let the status line join whatever is true: `Low stock · Expiring soon` must

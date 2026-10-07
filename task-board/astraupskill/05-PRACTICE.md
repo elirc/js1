@@ -10,7 +10,7 @@ Start with task ids [a, b, c]. Delete b: visible ids become [a, c] and recovery 
 
 Write one assertion for success and one for a rejected or failed operation. Then read the existing test and compare its observation with yours. Explain why a message alone would or would not prove the invariant.
 
-Then do the same for the create path, which was the asymmetry this project shipped with. Open `AstraOrganized2/astrafinalplan/implementation/backups/01/app.js:84-92` next to the current `app.js:94-103`. In the old version, `state.tasks.unshift(task)` ran before `saveTasks()`, so a failed write left a task on screen that would not survive reload, while `deleteTask` right below it already persisted first. Name which of the five tests in [test/undo.test.cjs](../test/undo.test.cjs) would have failed against the old code, and which would still have passed. (Answer in chapter 6.)
+Then do the same for the create path, which was the asymmetry this project shipped with. Open `git show 606e0e6:task-board/app.js` (lines 84-92) next to the current `app.js:94-103`. In the old version, `state.tasks.unshift(task)` ran before `saveTasks()`, so a failed write left a task on screen that would not survive reload, while `deleteTask` right below it already persisted first. Name which of the five tests in [test/undo.test.cjs](../test/undo.test.cjs) would have failed against the old code, and which would still have passed. (Answer in chapter 6.)
 
 ## Exercise 1 — guided extension
 

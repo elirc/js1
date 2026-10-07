@@ -1,17 +1,17 @@
 ﻿# Flashcards - C# Version
 
-This folder is a C# / ASP.NET Core Minimal API version of the original $(@{Slug=flashcards; Title=Flashcards; Entity=Flashcard; Route=flashcards; Filter=Deck; Fields=System.Object[]}.Slug) project. It keeps the same CRUD learning goal, but moves the implementation into C# concepts you will see in larger corporate codebases.
+This folder is a C# / ASP.NET Core Minimal API version of the original `../flashcards` project. It keeps the same CRUD learning goal, but moves the implementation into C# concepts you will see in larger corporate codebases.
 
 ## What to study
 
 - Program.cs maps HTTP endpoints to handlers.
 - Models.cs defines the domain record, request DTO, validation rules, and error response.
 - Repository.cs owns in-memory storage, filtering, creation, updates, and deletes.
-- $csprojName.csproj shows the project as an ASP.NET Core web app targeting .NET 8.
+- FlashcardsCSharp.csproj shows the project as an ASP.NET Core web app targeting .NET 8.
 
 ## API shape
 
-- GET /api/=value&filter=value lists records.
+- GET /api/flashcards?search=value&filter=value lists records (both query parameters optional).
 - GET /api/flashcards/{id} fetches one record.
 - POST /api/flashcards creates a record.
 - PUT /api/flashcards/{id} replaces a record.

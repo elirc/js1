@@ -47,7 +47,7 @@ Scheduled callbacks are opportunities to run code, not a guarantee about elapsed
 
 `tick` above is the delivered change. The second region is `completeSession` and its neighbours, rewritten in the 2026-09-17 follow-up because the course promised a failure boundary the project did not have, and because `completeSession` contained a dead assignment.
 
-Before (`AstraOrganized2/astrafinalplan/implementation/backups/03/app.js` plus the delivered guard):
+Before (`git show 606e0e6:focus-timer/app.js` plus the delivered guard):
 
 ```javascript
 function completeSession() {
